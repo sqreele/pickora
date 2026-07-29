@@ -19,7 +19,6 @@ def main() -> int:
         return pipeline_code
     # Monitoring must never invalidate a successful product refresh.
     run("link_monitor.py")
-    run("build_analytics_summary.py")
     return 0
 
 

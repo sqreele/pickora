@@ -106,26 +106,57 @@ docker compose down
 - Affiliate button clicks are sent to GA4 as the `affiliate_click` event
 - Search, share, comparison, sign-up, and CTA experiment events are sent to GA4
 - `EMAIL_SUBSCRIBE_ENDPOINT` must accept cross-origin JSON POST requests
-- `/analytics/` shows on-device counters only; use GA4 for aggregate reporting
+- `/analytics/` is a private, server-rendered GA4 Data API dashboard
 - Run `python3 scripts/seo-audit.py` before deployment
 
-## Aggregate analytics
+## Production analytics dashboard
 
-Create a Google Cloud service account, enable the Google Analytics Data API and
-Google Search Console API, then grant its email:
+The dashboard is served at `/analytics/`. Nginx routes `/api/analytics/` to the
+private `analytics-api` container; missing dashboard assets and API paths return
+404 instead of the home-page SPA fallback.
 
-- Viewer access to the GA4 property
-- Full or restricted access to the Search Console property
+Create a Google Cloud service account, enable the Google Analytics Data API,
+and grant its email Viewer access to the GA4 property. Set these values in
+`.env`:
 
-Set `GA4_PROPERTY_ID`, `SEARCH_CONSOLE_SITE_URL`, and
-`GOOGLE_SERVICE_ACCOUNT_JSON_B64` in `.env`. Also set a long alphanumeric
-`ANALYTICS_DASHBOARD_TOKEN`; it is required when the dashboard fetches the
-aggregate summary. Encode the JSON without line wraps:
+```env
+GA4_PROPERTY_ID=123456789
+GOOGLE_SERVICE_ACCOUNT_JSON_B64=...
+ANALYTICS_DASHBOARD_TOKEN=a-long-random-secret
+ANALYTICS_SESSION_SECONDS=28800
+ANALYTICS_COOKIE_SECURE=true
+```
+
+Encode the JSON without line wraps:
 
 ```bash
 base64 -w 0 service-account.json
 ```
 
-The credential is used only by the worker. The frontend reads aggregate,
-credential-free data from `/data/analytics-summary.json`; Nginx protects that
-file with the dashboard token request header.
+The base64 value is decoded only by `analytics-api`. The service-account JSON,
+private key, and configured dashboard token are never returned to the browser.
+Login is a native form POST; the server returns an HttpOnly, SameSite session
+cookie shared safely across Gunicorn workers.
+
+Deploy:
+
+```bash
+docker compose build --no-cache scheduler
+docker compose up -d --force-recreate scheduler analytics-api web
+docker compose ps
+curl -i http://127.0.0.1:${WEB_PORT:-8080}/analytics
+curl -i http://127.0.0.1:${WEB_PORT:-8080}/analytics/missing.js
+curl -i http://127.0.0.1:${WEB_PORT:-8080}/api/analytics/missing
+```
+
+Expected results are `308` for `/analytics`, then `404` for both missing paths.
+Open the HTTPS production URL `/analytics/` and enter
+`ANALYTICS_DASHBOARD_TOKEN`. For local HTTP-only browser testing, temporarily
+set `ANALYTICS_COOKIE_SECURE=false`; never use that setting in production.
+
+Run automated checks:
+
+```bash
+python -m unittest discover -s app/tests -v
+python3 scripts/seo-audit.py
+```
