@@ -1,0 +1,8 @@
+.env
+data/*
+!data/.gitkeep
+public/products.json
+public/feed-status.json
+__pycache__/
+*.pyc
+.DS_Store

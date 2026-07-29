@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Pickora คัดของน่าซื้อ ของใช้แก้ปัญหา และดีลที่กำลังได้รับความสนใจ">
+  <title>Pickora — คัดของดีที่น่าซื้อ</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="notice">ราคาหรือโปรโมชั่นอาจเปลี่ยนแปลง กรุณาตรวจสอบล่าสุดบน Shopee</div>
+
+  <header class="header">
+    <div class="container nav">
+      <a class="brand" href="/">
+        <span class="logo">P</span>
+        <span>Pickora</span>
+      </a>
+      <nav>
+        <a href="#products">สินค้าแนะนำ</a>
+        <a href="#disclosure">เกี่ยวกับ Affiliate</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <span class="pill">🔥 อัปเดตสินค้าอัตโนมัติทุกวัน</span>
+          <h1>ของน่าซื้อที่คัดมาแล้ว</h1>
+          <p>รวมของใช้แก้ปัญหา แกดเจ็ต ของใช้ในบ้าน รถยนต์ กีฬา และสินค้าที่คนกำลังสนใจ</p>
+          <a class="primary large" href="#products">ดูสินค้าแนะนำ</a>
+        </div>
+        <div class="hero-panel">
+          <strong>Pickora Ranking</strong>
+          <span>คัดจากยอดขาย คะแนนสินค้า ส่วนลด และค่าคอมมิชชัน</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="products">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>สินค้าแนะนำ</h2>
+            <p id="feedStatus">กำลังโหลดข้อมูลสินค้า...</p>
+          </div>
+        </div>
+
+        <input id="search" class="search" type="search" placeholder="ค้นหาสินค้า">
+        <div id="filters" class="filters"></div>
+        <div id="grid" class="grid"></div>
+        <div id="empty" class="empty" hidden>ไม่พบสินค้าที่ตรงกับคำค้นหา</div>
+      </div>
+    </section>
+
+    <section class="section" id="disclosure">
+      <div class="container disclosure">
+        <strong>Affiliate Disclosure</strong>
+        <p>เว็บไซต์นี้มีลิงก์ Affiliate หากคุณสั่งซื้อผ่านลิงก์ดังกล่าว Pickora อาจได้รับค่าคอมมิชชัน โดยไม่มีค่าใช้จ่ายเพิ่มเติมสำหรับผู้ซื้อ</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">© <span id="year"></span> Pickora · Operated on hotelcare.com</div>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>
