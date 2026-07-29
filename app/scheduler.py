@@ -18,7 +18,7 @@ SYNC_TIME = os.getenv("SYNC_HOUR", "04:00")
 def run_pipeline() -> None:
     logging.info("Starting Pickora feed pipeline")
     result = subprocess.run(
-        ["python", "run_pipeline.py"],
+        ["python", "run_once.py"],
         check=False,
     )
     logging.info("Pipeline exited with code %s", result.returncode)

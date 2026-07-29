@@ -1,0 +1,21 @@
+<!doctype html><html lang="th"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Analytics Dashboard | Pickora</title>
+<meta name="description" content="สรุปกิจกรรม Pickora ที่บันทึกบน browser เครื่องนี้">
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/content.css"><link rel="stylesheet" href="/catalog.css">
+</head><body>
+<header class="header"><div class="container nav"><a class="brand" href="/"><span class="logo">P</span><span>Pickora</span></a></div></header>
+<main class="content-main"><section class="container">
+<nav class="breadcrumbs"><a href="/">หน้าแรก</a> / Analytics</nav>
+<header class="article-header"><h1>Analytics Dashboard</h1><p>สรุปข้อมูลรวมจาก GA4 และ Google Search Console เมื่อเชื่อม service account แล้ว พร้อมสถานะระบบและกิจกรรมบนอุปกรณ์นี้</p></header>
+<h2>ภาพรวม 28 วัน</h2>
+<form id="analyticsAccess" class="dashboard-access"><label for="analyticsToken">Dashboard access token</label><input id="analyticsToken" type="password" autocomplete="off" required><button class="primary" type="submit">เปิดข้อมูลรวม</button></form>
+<div id="aggregateStatus" class="article-note">ใส่ access token เพื่อโหลดข้อมูลรวม</div><div id="aggregateGrid" class="metric-grid"></div>
+<h2>Commerce funnel</h2><div id="funnelGrid" class="metric-grid"></div>
+<h2>สถานะระบบ</h2><div id="systemGrid" class="metric-grid"></div>
+<h2>กิจกรรมบนอุปกรณ์นี้</h2><div id="metricGrid" class="metric-grid"></div>
+<div class="article-note"><strong>ขอบเขตข้อมูล:</strong> กิจกรรมบนอุปกรณ์นี้เปลี่ยนตาม browser data ส่วนภาพรวมด้านบนมาจากข้อมูล aggregate ที่ worker ดึงผ่าน Google APIs โดยไม่มี credential ส่งมาที่ browser</div>
+<button id="clearMetrics" class="primary large" type="button">ล้างข้อมูลบนเครื่องนี้</button>
+</section></main><script src="/dashboard.js"></script>
+</body></html>

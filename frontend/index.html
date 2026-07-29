@@ -7,6 +7,7 @@
   <title>Pickora — คัดของดีที่น่าซื้อ</title>
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/content.css">
+  <link rel="stylesheet" href="/catalog.css">
   <link rel="canonical" href="https://pickora.hotelcarepro.com/">
   <script type="application/ld+json">
     {
@@ -41,7 +42,7 @@
       </a>
       <nav>
         <a href="#products">สินค้าแนะนำ</a>
-        <a href="#guides">คู่มือเลือกซื้อ</a>
+        <a href="/guides/">คู่มือเลือกซื้อ</a>
         <a href="/about/">เกี่ยวกับเรา</a>
       </nav>
     </div>
@@ -76,10 +77,35 @@
           </div>
         </div>
 
-        <input id="search" class="search" type="search" placeholder="ค้นหาสินค้า">
+        <div class="catalog-controls">
+          <input id="search" class="search" type="search" placeholder="ค้นหาสินค้า" aria-label="ค้นหาสินค้า">
+          <label class="sort-control">เรียงตาม
+            <select id="sort" aria-label="เรียงลำดับสินค้า">
+              <option value="recommended">แนะนำ</option>
+              <option value="price-asc">ราคาต่ำ–สูง</option>
+              <option value="price-desc">ราคาสูง–ต่ำ</option>
+              <option value="rating-desc">คะแนนสูงสุด</option>
+              <option value="sold-desc">ยอดขายสูงสุด</option>
+            </select>
+          </label>
+        </div>
         <div id="filters" class="filters"></div>
         <div id="grid" class="grid"></div>
         <div id="empty" class="empty" hidden>ไม่พบสินค้าที่ตรงกับคำค้นหา</div>
+      </div>
+    </section>
+
+    <section class="section discovery-section" id="popular">
+      <div class="container">
+        <div class="section-head"><h2>สินค้ายอดนิยม</h2><p>เรียงจากยอดขายในข้อมูลล่าสุด</p></div>
+        <div id="popularGrid" class="grid compact-grid"></div>
+      </div>
+    </section>
+
+    <section class="section discovery-section" id="recentlyViewed" hidden>
+      <div class="container">
+        <div class="section-head"><h2>ดูล่าสุด</h2><p>รายการที่คุณเพิ่งเปิดดูบนอุปกรณ์นี้</p></div>
+        <div id="recentGrid" class="grid compact-grid"></div>
       </div>
     </section>
 
@@ -104,6 +130,7 @@
           <a class="content-card" href="/compare/power-bank-capacity.html"><strong>Power Bank 10,000 vs 20,000</strong><span>เทียบพลังงาน น้ำหนัก และการพกพา</span></a>
           <a class="content-card" href="/compare/air-fryer-vs-oven.html"><strong>หม้อทอด vs เตาอบ</strong><span>เทียบความเร็ว ความจุ และเมนูที่เหมาะ</span></a>
         </div>
+        <p class="guides-more"><a class="primary large" href="/guides/">ดูคู่มือและบทความทั้งหมด</a></p>
       </div>
     </section>
 
@@ -114,10 +141,18 @@
         <a href="/affiliate-disclosure/">อ่านคำชี้แจงฉบับเต็ม</a>
       </div>
     </section>
+
+    <section class="section">
+      <div class="container newsletter">
+        <div><strong>รับคู่มือและสินค้าน่าสนใจ</strong><p>ส่งเป็นครั้งคราว ยกเลิกได้ทุกเมื่อ</p></div>
+        <form id="emailSignup"><label class="sr-only" for="signupEmail">อีเมล</label><input id="signupEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com" required><button class="primary" type="submit">สมัครรับข่าวสาร</button></form>
+        <p id="emailSignupStatus" role="status"></p>
+      </div>
+    </section>
   </main>
 
   <footer>
-    <div class="container">© <span id="year"></span> Pickora · <a href="/about/">เกี่ยวกับเรา</a> · <a href="/affiliate-disclosure/">Affiliate Disclosure</a></div>
+    <div class="container">© <span id="year"></span> Pickora · <a href="/guides/">คู่มือ</a> · <a href="/about/">เกี่ยวกับเรา</a> · <a href="/affiliate-disclosure/">Affiliate Disclosure</a></div>
   </footer>
 
   <script src="/app.js"></script>

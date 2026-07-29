@@ -8,6 +8,7 @@ services:
       - .env
     environment:
       TZ: ${TZ:-Asia/Bangkok}
+      SITE_URL: ${SITE_URL:-https://pickora.hotelcarepro.com}
     volumes:
       - ./data:/app/data
       - ./public:/app/public
@@ -21,10 +22,11 @@ services:
       - .env
     environment:
       TZ: ${TZ:-Asia/Bangkok}
+      SITE_URL: ${SITE_URL:-https://pickora.hotelcarepro.com}
     volumes:
       - ./data:/app/data
       - ./public:/app/public
-    command: ["python", "run_pipeline.py"]
+    command: ["python", "run_once.py"]
 
   web:
     image: nginx:1.27-alpine
@@ -32,10 +34,16 @@ services:
     restart: unless-stopped
     ports:
       - "${WEB_PORT:-8080}:80"
+    environment:
+      GA4_MEASUREMENT_ID: ${GA4_MEASUREMENT_ID:-}
+      EMAIL_SUBSCRIBE_ENDPOINT: ${EMAIL_SUBSCRIBE_ENDPOINT:-}
+      GOOGLE_SITE_VERIFICATION: ${GOOGLE_SITE_VERIFICATION:-}
+      ANALYTICS_DASHBOARD_TOKEN: ${ANALYTICS_DASHBOARD_TOKEN:-}
+      NGINX_ENVSUBST_FILTER: GA4_MEASUREMENT_ID|EMAIL_SUBSCRIBE_ENDPOINT|GOOGLE_SITE_VERIFICATION|ANALYTICS_DASHBOARD_TOKEN
     volumes:
       - ./frontend:/usr/share/nginx/html:ro
       - ./public:/usr/share/nginx/data:ro
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/default.conf:/etc/nginx/templates/default.conf.template:ro
     healthcheck:
       test:
         - CMD-SHELL

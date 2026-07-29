@@ -1,0 +1,16 @@
+.product-detail{padding-top:36px;padding-bottom:64px}
+.product-detail-grid{display:grid;grid-template-columns:minmax(280px,520px) 1fr;gap:42px;align-items:start;margin-top:22px}
+.product-detail-image{width:100%;aspect-ratio:1;object-fit:contain;border-radius:22px;background:#fff;border:1px solid #e5e8ee}
+.product-detail h1{font-size:clamp(30px,4vw,52px);line-height:1.15;letter-spacing:-.025em}
+.product-shop,.affiliate-inline{color:#667085}
+.product-detail-price{font-size:32px;color:#ee4d2d;font-weight:900;margin:18px 0}
+.affiliate-inline{font-size:14px;line-height:1.6}
+.product-buy{min-height:54px;padding:0 22px}
+.related-products{margin-top:56px}.related-products h2{font-size:30px}.related-card .title a{color:inherit;text-decoration:none}
+.breadcrumbs{line-height:1.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.breadcrumbs a{color:#d84022}
+.category-header{margin:24px 0 28px}.category-header h1{font-size:clamp(36px,6vw,62px);margin-bottom:10px}.category-header p{color:#667085}
+.card-image-link{display:block;line-height:0}.card .category{text-decoration:none}
+.product-score{display:flex;align-items:center;gap:12px;margin:18px 0}.product-score>strong{display:grid;place-items:center;width:62px;height:62px;border-radius:50%;background:#ee4d2d;color:#fff;font-size:24px}.product-score span{font-weight:900}.product-score small{display:block;max-width:360px;margin-top:4px;color:#667085;font-weight:400;line-height:1.4}.more-guides{margin-top:28px}.more-guides a{color:#d84022;font-weight:800}
+.secondary-action,.share-actions button,.share-actions a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;margin-top:10px;padding:0 14px;border:1px solid #dfe3ea;border-radius:10px;background:#fff;color:#162033;text-decoration:none;font-weight:800;cursor:pointer}.share-actions{display:flex;gap:8px;flex-wrap:wrap}.price-history{margin-top:42px}.price-history>p{color:#667085}.price-history ul{max-width:520px;padding:0;list-style:none}.price-history li{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e8ee}
+@media(max-width:900px){.product-detail-grid{grid-template-columns:1fr}}
+@media(max-width:680px){.related-products .grid{grid-template-columns:1fr}.related-products .card{display:grid;grid-template-columns:116px 1fr}.related-products .card img{height:100%;min-height:180px}.product-detail{padding-top:24px}.product-detail-grid{gap:24px}}

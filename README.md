@@ -1,6 +1,6 @@
 # Pickora
 
-Shopee Affiliate product discovery site for `pickora.hotelcare.com`.
+Shopee Affiliate product discovery site for `pickora.hotelcarepro.com`.
 
 ## Architecture
 
@@ -20,6 +20,7 @@ nano .env
 ```
 
 Set the private Shopee Data Feed URL in `.env`.
+Set `GA4_MEASUREMENT_ID` to the ID from your GA4 web data stream (format `G-...`).
 
 ```bash
 docker compose build
@@ -38,6 +39,9 @@ Test:
 curl http://SERVER_IP:8080/health
 curl http://SERVER_IP:8080/data/feed-status.json
 curl http://SERVER_IP:8080/data/products.json | head
+curl http://SERVER_IP:8080/sitemap.xml | head
+curl http://SERVER_IP:8080/data/seo-status.json
+curl http://SERVER_IP:8080/data/link-health.json
 ```
 
 Open:
@@ -68,7 +72,7 @@ sudo systemctl reload nginx
 Add HTTPS:
 
 ```bash
-sudo certbot --nginx -d pickora.hotelcare.com
+sudo certbot --nginx -d pickora.hotelcarepro.com
 ```
 
 When Cloudflare proxy is enabled, set SSL/TLS mode to Full (strict) after the certificate is active.
@@ -90,3 +94,30 @@ docker compose down
 - The Shopee feed URL should remain private
 - Column names can vary; the worker detects common column names automatically
 - If detection fails, inspect the first line of the CSV and update the candidate names in `app/run_pipeline.py`
+- Every feed refresh regenerates product detail pages and `sitemap.xml`
+- Affiliate button clicks are sent to GA4 as the `affiliate_click` event
+- Search, share, comparison, sign-up, and CTA experiment events are sent to GA4
+- `EMAIL_SUBSCRIBE_ENDPOINT` must accept cross-origin JSON POST requests
+- `/analytics/` shows on-device counters only; use GA4 for aggregate reporting
+- Run `python3 scripts/seo-audit.py` before deployment
+
+## Aggregate analytics
+
+Create a Google Cloud service account, enable the Google Analytics Data API and
+Google Search Console API, then grant its email:
+
+- Viewer access to the GA4 property
+- Full or restricted access to the Search Console property
+
+Set `GA4_PROPERTY_ID`, `SEARCH_CONSOLE_SITE_URL`, and
+`GOOGLE_SERVICE_ACCOUNT_JSON_B64` in `.env`. Also set a long alphanumeric
+`ANALYTICS_DASHBOARD_TOKEN`; it is required when the dashboard fetches the
+aggregate summary. Encode the JSON without line wraps:
+
+```bash
+base64 -w 0 service-account.json
+```
+
+The credential is used only by the worker. The frontend reads aggregate,
+credential-free data from `/data/analytics-summary.json`; Nginx protects that
+file with the dashboard token request header.
