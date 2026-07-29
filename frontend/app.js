@@ -29,9 +29,18 @@ function formatSold(value) {
 }
 
 function renderFilters() {
+  const categoryCounts = products.reduce((counts, product) => {
+    const category = product.category?.trim();
+    if (category) counts.set(category, (counts.get(category) || 0) + 1);
+    return counts;
+  }, new Map());
+
   const categories = [
     "ทั้งหมด",
-    ...new Set(products.map(p => p.category).filter(Boolean).slice(0, 12))
+    ...[...categoryCounts]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([category]) => category)
   ];
 
   filters.innerHTML = categories.map(category => `
