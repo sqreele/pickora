@@ -28,6 +28,11 @@ class ProductionRouteTest(unittest.TestCase):
         ):
             self.assertTrue((ROOT / path).is_file(), path)
 
+    def test_quantified_location_regexes_are_quoted_for_nginx(self):
+        nginx = (ROOT / "nginx/default.conf").read_text(encoding="utf-8")
+        self.assertIn('location ~ "^/products/([a-f0-9]{16})/$" {', nginx)
+        self.assertIn('location ~ "^/categories/([a-f0-9]{12})/$" {', nginx)
+
 
 if __name__ == "__main__":
     unittest.main()
