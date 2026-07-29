@@ -213,11 +213,13 @@ def process_feed() -> None:
             "product_name", "item_name", "title", "product_title", "productname"
         ])
         image_col = find_column(columns, [
-            "image_url", "product_image", "image", "item_image", "imageurl"
+            "image_url", "image_link", "product_image", "image", "item_image",
+            "imageurl"
         ])
         link_col = find_column(columns, [
             "affiliate_link", "product_link", "offer_link", "item_url",
-            "product_url", "tracking_link", "affiliate_url"
+            "product_url", "tracking_link", "affiliate_url",
+            "product_short_link"
         ])
         price_col = find_column(columns, [
             "price", "sale_price", "current_price", "product_price"
@@ -236,15 +238,25 @@ def process_feed() -> None:
             "discount", "discount_percentage", "discount_rate"
         ])
         category_col = find_column(columns, [
-            "category", "category_name", "product_category", "category_l1"
+            "category", "category_name", "product_category", "category_l1",
+            "global_category1"
         ])
         shop_col = find_column(columns, [
             "shop_name", "seller_name", "merchant_name"
         ])
 
         if not title_col or not image_col or not link_col:
+            missing = [
+                name
+                for name, column in (
+                    ("title", title_col),
+                    ("image", image_col),
+                    ("link", link_col),
+                )
+                if not column
+            ]
             raise RuntimeError(
-                "Required columns were not found. "
+                f"Required columns were not found: {', '.join(missing)}. "
                 f"Available columns: {columns}"
             )
 
