@@ -34,7 +34,15 @@ services:
       - "${WEB_PORT:-8080}:80"
     volumes:
       - ./frontend:/usr/share/nginx/html:ro
-      - ./public:/usr/share/nginx/html/data:ro
+      - ./public:/usr/share/nginx/data:ro
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -qO- http://127.0.0.1/health | grep -q '"status":"ok"'
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     depends_on:
       - scheduler
