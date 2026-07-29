@@ -72,7 +72,7 @@ function renderProducts() {
         <div class="price">${esc(formatPrice(product.price))}</div>
         <a class="primary buy" href="${esc(product.link)}"
           target="_blank" rel="nofollow sponsored noopener"
-          data-product="${esc(product.title)}">ดูสินค้าใน Shopee</a>
+          data-product="${esc(product.title)}">เช็กราคาใน Shopee <span aria-hidden="true">→</span></a>
       </div>
     </article>
   `).join("");
