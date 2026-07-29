@@ -1,5 +1,6 @@
 services:
   scheduler:
+    image: pickora-app:latest
     build:
       context: ./app
     container_name: pickora-scheduler
@@ -15,6 +16,7 @@ services:
     command: ["python", "scheduler.py"]
 
   worker:
+    image: pickora-app:latest
     build:
       context: ./app
     profiles: ["manual"]

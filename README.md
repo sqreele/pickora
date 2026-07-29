@@ -33,6 +33,14 @@ Run the first update manually:
 docker compose run --rm worker
 ```
 
+`scheduler` and `worker` share the same `pickora-app:latest` image. After
+updating files under `app/`, rebuild that image before running the worker:
+
+```bash
+docker compose build --no-cache scheduler
+docker compose run --rm worker
+```
+
 Test:
 
 ```bash
