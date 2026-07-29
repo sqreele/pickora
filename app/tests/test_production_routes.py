@@ -25,6 +25,7 @@ class ProductionRouteTest(unittest.TestCase):
             "frontend/analytics/index.html",
             "frontend/analytics/dashboard.js",
             "frontend/analytics/dashboard.css",
+            "frontend/analytics/dashboard-state.css",
         ):
             self.assertTrue((ROOT / path).is_file(), path)
 
@@ -32,6 +33,12 @@ class ProductionRouteTest(unittest.TestCase):
         nginx = (ROOT / "nginx/default.conf").read_text(encoding="utf-8")
         self.assertIn('location ~ "^/products/([a-f0-9]{16})/$" {', nginx)
         self.assertIn('location ~ "^/categories/([a-f0-9]{12})/$" {', nginx)
+
+    def test_dashboard_hidden_states_cannot_be_overridden(self):
+        css = (
+            ROOT / "frontend/analytics/dashboard-state.css"
+        ).read_text(encoding="utf-8")
+        self.assertIn("display: none !important", css)
 
 
 if __name__ == "__main__":
