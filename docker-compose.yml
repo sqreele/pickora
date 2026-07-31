@@ -38,3 +38,11 @@ services:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - scheduler
+    networks:
+      - default
+      - pcms_network
+
+networks:
+  pcms_network:
+    external: true
+    name: pcms_network
