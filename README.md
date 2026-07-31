@@ -1,6 +1,6 @@
 # Pickora
 
-Shopee Affiliate product discovery site for `pickora.hotelcare.com`.
+Shopee Affiliate product discovery site for `pickora.hotelcarepro.com`.
 
 ## Architecture
 
@@ -68,7 +68,7 @@ sudo systemctl reload nginx
 Add HTTPS:
 
 ```bash
-sudo certbot --nginx -d pickora.hotelcare.com
+sudo certbot --nginx -d pickora.hotelcarepro.com
 ```
 
 When Cloudflare proxy is enabled, set SSL/TLS mode to Full (strict) after the certificate is active.
