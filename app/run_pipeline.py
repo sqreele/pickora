@@ -220,6 +220,16 @@ def category_id(category: str) -> str:
     return hashlib.sha256(category.encode("utf-8")).hexdigest()[:12]
 
 
+def display_category(value: object) -> str:
+    """Return a useful Thai category label for values supplied by the feed."""
+    category = str(value).strip()
+    if category.casefold() in {
+        "", "nan", "none", "null", "product", "products", "foreign",
+    } or category == "ต่างด้าว":
+        return "สินค้าแนะนำ"
+    return category
+
+
 def safe_external_url(value: object) -> str:
     url = str(value).strip()
     parsed = urlparse(url)
@@ -668,7 +678,7 @@ def process_feed() -> None:
             else f"link:{product['link']}"
         )
         identifier = product_id(identity)
-        category = str(product.get("category") or "สินค้าแนะนำ").strip()
+        category = display_category(product.get("category"))
         product["category"] = category
         product["id"] = identifier
         product["detailUrl"] = f"/products/{identifier}/"
