@@ -39,14 +39,24 @@ function productDetailUrl(product) {
   return product.url || "/#products";
 }
 
+function displayCategory(value) {
+  const category = String(value ?? "").trim();
+  const placeholder = category.toLocaleLowerCase("en-US");
+  if (["", "nan", "none", "null", "product", "products", "foreign", "ต่างด้าว"].includes(placeholder)) {
+    return "สินค้าแนะนำ";
+  }
+  return category;
+}
+
 function productCard(product) {
   const detailUrl = productDetailUrl(product);
+  const category = displayCategory(product.category);
   return `
     <article class="card">
       <a class="card-image-link" href="${esc(detailUrl)}"><img src="${esc(product.image)}" alt="${esc(product.title)}" loading="lazy" decoding="async" width="600" height="600"
         onerror="this.src='https://placehold.co/800x800?text=Pickora'"></a>
       <div class="card-body">
-        ${product.categoryUrl ? `<a class="category" href="${esc(product.categoryUrl)}">${esc(product.category || "สินค้าแนะนำ")}</a>` : ""}
+        ${product.categoryUrl ? `<a class="category" href="${esc(product.categoryUrl)}">${esc(category)}</a>` : ""}
         <h3 class="title">${esc(product.title)}</h3>
         <div class="meta"><span>${product.rating ? `★ ${esc(product.rating)}` : ""}</span><span>${esc(formatSold(product.sold))}</span></div>
         ${product.pickoraScore || product.score ? `<div class="score-badge">Pickora Score ${esc(product.pickoraScore || product.score)}</div>` : ""}
@@ -58,7 +68,7 @@ function productCard(product) {
 
 function renderFilters() {
   const categoryCounts = products.reduce((counts, product) => {
-    const category = product.category?.trim();
+    const category = displayCategory(product.category);
     if (category) counts.set(category, (counts.get(category) || 0) + 1);
     return counts;
   }, new Map());
@@ -90,7 +100,7 @@ function renderProducts() {
 
   const visible = products.filter(product => {
     const categoryOk =
-      activeCategory === "ทั้งหมด" || product.category === activeCategory;
+      activeCategory === "ทั้งหมด" || displayCategory(product.category) === activeCategory;
     const text = `${product.title} ${product.category} ${product.shop}`.toLowerCase();
     return categoryOk && text.includes(keyword);
   }).sort((a, b) => {
