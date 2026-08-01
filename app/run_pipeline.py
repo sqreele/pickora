@@ -83,6 +83,40 @@ STATIC_SITEMAP_PATHS = (
     ("/compare/air-fryer-vs-oven.html", "monthly", "0.7"),
 )
 
+PRODUCT_TEXT_FIELDS = ("title", "category", "shop", "description")
+
+
+def repair_mojibake(value: object) -> object:
+    """Repair common UTF-8-as-Western-encoding mojibake, when clearly marked.
+
+    Correct Unicode and values of other types are intentionally returned without
+    conversion.  Trying Latin-1 first handles byte-preserving misdecoding, while
+    CP1252 covers feeds that used Windows' closely related Western code page.
+    """
+    if not isinstance(value, str):
+        return value
+
+    mojibake_markers = ("à¸", "à¹", "Ã", "Â")
+    if not any(marker in value for marker in mojibake_markers):
+        return value
+
+    for source_encoding in ("latin1", "cp1252"):
+        try:
+            repaired = value.encode(source_encoding).decode("utf-8")
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            continue
+        if repaired != value:
+            return repaired
+
+    return value
+
+
+def normalise_product_text(product: dict[str, object]) -> None:
+    """Repair feed-provided textual product fields in place."""
+    for field in PRODUCT_TEXT_FIELDS:
+        if field in product:
+            product[field] = repair_mojibake(product[field])
+
 
 def normalise(value: str) -> str:
     return (
@@ -676,6 +710,7 @@ def process_feed() -> None:
     invalid_urls = len(all_records) - len(records)
     record_count = len(records)
     for rank, product in enumerate(records):
+        normalise_product_text(product)
         external_id = str(product.get("externalId") or "").strip()
         identity = (
             f"feed:{external_id}"
