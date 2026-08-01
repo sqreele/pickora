@@ -3,9 +3,33 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Pickora คัดของน่าซื้อ ของใช้แก้ปัญหา และดีลที่กำลังได้รับความสนใจ">
+  <meta name="description" content="Pickora ช่วยคัดสินค้าน่าซื้อจากยอดขาย คะแนน และส่วนลด เพื่อให้คุณเลือกซื้อได้ง่ายและเร็วขึ้น">
   <title>Pickora — คัดของดีที่น่าซื้อ</title>
   <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/content.css">
+  <link rel="stylesheet" href="/catalog.css">
+  <link rel="canonical" href="https://pickora.hotelcarepro.com/">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://pickora.hotelcarepro.com/#organization",
+          "name": "Pickora",
+          "url": "https://pickora.hotelcarepro.com/"
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://pickora.hotelcarepro.com/#website",
+          "name": "Pickora",
+          "url": "https://pickora.hotelcarepro.com/",
+          "publisher": {"@id": "https://pickora.hotelcarepro.com/#organization"},
+          "inLanguage": "th"
+        }
+      ]
+    }
+  </script>
 </head>
 <body>
   <div class="notice">ราคาหรือโปรโมชั่นอาจเปลี่ยนแปลง กรุณาตรวจสอบล่าสุดบน Shopee</div>
@@ -18,7 +42,8 @@
       </a>
       <nav>
         <a href="#products">สินค้าแนะนำ</a>
-        <a href="#disclosure">เกี่ยวกับ Affiliate</a>
+        <a href="/guides/">คู่มือเลือกซื้อ</a>
+        <a href="/about/">เกี่ยวกับเรา</a>
       </nav>
     </div>
   </header>
@@ -28,13 +53,17 @@
       <div class="container hero-grid">
         <div>
           <span class="pill">🔥 อัปเดตสินค้าอัตโนมัติทุกวัน</span>
-          <h1>ของน่าซื้อที่คัดมาแล้ว</h1>
-          <p>รวมของใช้แก้ปัญหา แกดเจ็ต ของใช้ในบ้าน รถยนต์ กีฬา และสินค้าที่คนกำลังสนใจ</p>
-          <a class="primary large" href="#products">ดูสินค้าแนะนำ</a>
+          <h1>เลือกของน่าซื้อได้ง่ายขึ้น</h1>
+          <p>Pickora ช่วยคัดสินค้าที่น่าสนใจจากยอดขาย คะแนน และส่วนลด ให้คุณเปรียบเทียบตัวเลือกได้เร็วขึ้น โดยไม่ต้องไล่หาทีละร้าน</p>
+          <a class="primary large" href="#products">เริ่มเลือกสินค้า</a>
         </div>
         <div class="hero-panel">
-          <strong>Pickora Ranking</strong>
-          <span>คัดจากยอดขาย คะแนนสินค้า ส่วนลด และค่าคอมมิชชัน</span>
+          <strong>Pickora ช่วยคุณอย่างไร</strong>
+          <ul class="hero-benefits">
+            <li>คัดตัวเลือกที่น่าสนใจจากข้อมูลสินค้า</li>
+            <li>รวมราคา คะแนน และยอดขายไว้ให้ดูง่าย</li>
+            <li>พาไปเช็กราคาล่าสุดบน Shopee ได้ทันที</li>
+          </ul>
         </div>
       </div>
     </section>
@@ -48,10 +77,60 @@
           </div>
         </div>
 
-        <input id="search" class="search" type="search" placeholder="ค้นหาสินค้า">
+        <div class="catalog-controls">
+          <input id="search" class="search" type="search" placeholder="ค้นหาสินค้า" aria-label="ค้นหาสินค้า">
+          <label class="sort-control">เรียงตาม
+            <select id="sort" aria-label="เรียงลำดับสินค้า">
+              <option value="recommended">แนะนำ</option>
+              <option value="price-asc">ราคาต่ำ–สูง</option>
+              <option value="price-desc">ราคาสูง–ต่ำ</option>
+              <option value="rating-desc">คะแนนสูงสุด</option>
+              <option value="sold-desc">ยอดขายสูงสุด</option>
+            </select>
+          </label>
+        </div>
         <div id="filters" class="filters"></div>
         <div id="grid" class="grid"></div>
         <div id="empty" class="empty" hidden>ไม่พบสินค้าที่ตรงกับคำค้นหา</div>
+      </div>
+    </section>
+
+    <section class="section discovery-section" id="popular">
+      <div class="container">
+        <div class="section-head"><h2>สินค้ายอดนิยม</h2><p>เรียงจากยอดขายในข้อมูลล่าสุด</p></div>
+        <div id="popularGrid" class="grid compact-grid"></div>
+      </div>
+    </section>
+
+    <section class="section discovery-section" id="recentlyViewed" hidden>
+      <div class="container">
+        <div class="section-head"><h2>ดูล่าสุด</h2><p>รายการที่คุณเพิ่งเปิดดูบนอุปกรณ์นี้</p></div>
+        <div id="recentGrid" class="grid compact-grid"></div>
+      </div>
+    </section>
+
+    <section class="section" id="guides">
+      <div class="container">
+        <div class="section-head">
+          <h2>คู่มือเลือกซื้อ</h2>
+          <p>อ่านเกณฑ์สำคัญก่อนเปรียบเทียบราคาและตัดสินใจ</p>
+        </div>
+        <div class="content-cards">
+          <a class="content-card" href="/reviews/portable-fan.html"><strong>เลือกพัดลมพกพา</strong><span>เทียบแรงลม แบตเตอรี่ น้ำหนัก และเสียง</span></a>
+          <a class="content-card" href="/reviews/power-bank.html"><strong>เลือก Power Bank</strong><span>เข้าใจความจุจริง กำลังชาร์จ และความปลอดภัย</span></a>
+          <a class="content-card" href="/reviews/robot-vacuum.html"><strong>เลือกหุ่นยนต์ดูดฝุ่น</strong><span>ดูระบบนำทาง รูปแบบบ้าน และค่าอะไหล่</span></a>
+          <a class="content-card" href="/reviews/air-fryer.html"><strong>เลือกหม้อทอดไร้น้ำมัน</strong><span>เลือกความจุและรูปทรงตะกร้าให้เหมาะ</span></a>
+          <a class="content-card" href="/reviews/car-camera.html"><strong>เลือกกล้องติดรถยนต์</strong><span>ดูคุณภาพภาพจริง ระบบจอดรถ และการติดตั้ง</span></a>
+          <a class="content-card" href="/reviews/mechanical-keyboard.html"><strong>เลือก Mechanical Keyboard</strong><span>เทียบขนาด สวิตช์ และการเชื่อมต่อ</span></a>
+          <a class="content-card" href="/reviews/wireless-earbuds.html"><strong>เลือกหูฟังไร้สาย</strong><span>ดูความพอดี ไมค์ ANC และแบตเตอรี่</span></a>
+          <a class="content-card" href="/reviews/office-chair.html"><strong>เลือกเก้าอี้ทำงาน</strong><span>วัดขนาดและจุดปรับให้เข้ากับร่างกาย</span></a>
+          <a class="content-card" href="/reviews/smart-watch.html"><strong>เลือก Smart Watch</strong><span>เช็กระบบมือถือ GPS และฟังก์ชันสุขภาพ</span></a>
+          <a class="content-card" href="/reviews/water-bottle.html"><strong>เลือกขวดเก็บอุณหภูมิ</strong><span>ดูวัสดุ ฝา ความจุ และการทำความสะอาด</span></a>
+          <a class="content-card" href="/compare/portable-fan-types.html"><strong>เทียบพัดลมพกพา 3 แบบ</strong><span>มือถือ ตั้งโต๊ะ หรือคล้องคอ</span></a>
+          <a class="content-card" href="/compare/power-bank-capacity.html"><strong>Power Bank 10,000 vs 20,000</strong><span>เทียบพลังงาน น้ำหนัก และการพกพา</span></a>
+          <a class="content-card" href="/compare/air-fryer-vs-oven.html"><strong>หม้อทอด vs เตาอบ</strong><span>เทียบความเร็ว ความจุ และเมนูที่เหมาะ</span></a>
+        </div>
+        <p class="guides-more"><a class="primary large" href="/guides/">ดูคู่มือและบทความทั้งหมด</a></p>
       </div>
     </section>
 
@@ -59,12 +138,21 @@
       <div class="container disclosure">
         <strong>Affiliate Disclosure</strong>
         <p>เว็บไซต์นี้มีลิงก์ Affiliate หากคุณสั่งซื้อผ่านลิงก์ดังกล่าว Pickora อาจได้รับค่าคอมมิชชัน โดยไม่มีค่าใช้จ่ายเพิ่มเติมสำหรับผู้ซื้อ</p>
+        <a href="/affiliate-disclosure/">อ่านคำชี้แจงฉบับเต็ม</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container newsletter">
+        <div><strong>รับคู่มือและสินค้าน่าสนใจ</strong><p>ส่งเป็นครั้งคราว ยกเลิกได้ทุกเมื่อ</p></div>
+        <form id="emailSignup"><label class="sr-only" for="signupEmail">อีเมล</label><input id="signupEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com" required><button class="primary" type="submit">สมัครรับข่าวสาร</button></form>
+        <p id="emailSignupStatus" role="status"></p>
       </div>
     </section>
   </main>
 
   <footer>
-    <div class="container">© <span id="year"></span> Pickora · Operated on hotelcare.com</div>
+    <div class="container">© <span id="year"></span> Pickora · <a href="/guides/">คู่มือ</a> · <a href="/about/">เกี่ยวกับเรา</a> · <a href="/affiliate-disclosure/">Affiliate Disclosure</a></div>
   </footer>
 
   <script src="/app.js"></script>

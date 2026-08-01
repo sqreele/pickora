@@ -4,8 +4,13 @@ let activeCategory = "ทั้งหมด";
 const grid = document.getElementById("grid");
 const filters = document.getElementById("filters");
 const search = document.getElementById("search");
+const sort = document.getElementById("sort");
 const empty = document.getElementById("empty");
 const feedStatus = document.getElementById("feedStatus");
+const popularGrid = document.getElementById("popularGrid");
+const recentGrid = document.getElementById("recentGrid");
+const recentlyViewed = document.getElementById("recentlyViewed");
+let searchAnalyticsTimer;
 
 function esc(value) {
   return String(value ?? "")
@@ -28,15 +33,40 @@ function formatSold(value) {
   return `ขายแล้ว ${number.toLocaleString("th-TH")}`;
 }
 
+function productCard(product) {
+  return `
+    <article class="card">
+      <a class="card-image-link" href="${esc(product.detailUrl || product.url)}"><img src="${esc(product.image)}" alt="${esc(product.title)}" loading="lazy" decoding="async" width="600" height="600"
+        onerror="this.src='https://placehold.co/800x800?text=Pickora'"></a>
+      <div class="card-body">
+        ${product.categoryUrl ? `<a class="category" href="${esc(product.categoryUrl)}">${esc(product.category || "สินค้าแนะนำ")}</a>` : ""}
+        <h3 class="title">${esc(product.title)}</h3>
+        <div class="meta"><span>${product.rating ? `★ ${esc(product.rating)}` : ""}</span><span>${esc(formatSold(product.sold))}</span></div>
+        ${product.pickoraScore || product.score ? `<div class="score-badge">Pickora Score ${esc(product.pickoraScore || product.score)}</div>` : ""}
+        <div class="price">${esc(formatPrice(product.price))}</div>
+        <a class="primary buy" href="${esc(product.detailUrl || product.url)}" aria-label="ดูรายละเอียด ${esc(product.title)}">ดูรายละเอียด <span aria-hidden="true">→</span></a>
+      </div>
+    </article>`;
+}
+
 function renderFilters() {
+  const categoryCounts = products.reduce((counts, product) => {
+    const category = product.category?.trim();
+    if (category) counts.set(category, (counts.get(category) || 0) + 1);
+    return counts;
+  }, new Map());
+
   const categories = [
     "ทั้งหมด",
-    ...new Set(products.map(p => p.category).filter(Boolean).slice(0, 12))
+    ...[...categoryCounts]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([category]) => category)
   ];
 
   filters.innerHTML = categories.map(category => `
     <button class="filter ${category === activeCategory ? "active" : ""}"
-      data-category="${esc(category)}">${esc(category)}</button>
+        data-category="${esc(category)}">${esc(category)} <span>${category === "ทั้งหมด" ? products.length : categoryCounts.get(category)}</span></button>
   `).join("");
 
   filters.querySelectorAll(".filter").forEach(button => {
@@ -56,28 +86,42 @@ function renderProducts() {
       activeCategory === "ทั้งหมด" || product.category === activeCategory;
     const text = `${product.title} ${product.category} ${product.shop}`.toLowerCase();
     return categoryOk && text.includes(keyword);
+  }).sort((a, b) => {
+    switch (sort.value) {
+      case "price-asc":
+        return (Number(a.price) || Number.MAX_SAFE_INTEGER) - (Number(b.price) || Number.MAX_SAFE_INTEGER);
+      case "price-desc":
+        return (Number(b.price) || 0) - (Number(a.price) || 0);
+      case "rating-desc":
+        return (Number(b.rating) || 0) - (Number(a.rating) || 0);
+      case "sold-desc":
+        return (Number(b.sold) || 0) - (Number(a.sold) || 0);
+      default:
+        return (Number(b.score) || 0) - (Number(a.score) || 0);
+    }
   });
 
-  grid.innerHTML = visible.map(product => `
-    <article class="card">
-      <img src="${esc(product.image)}" alt="${esc(product.title)}" loading="lazy"
-        onerror="this.src='https://placehold.co/800x800?text=Pickora'">
-      <div class="card-body">
-        <div class="category">${esc(product.category || "สินค้าแนะนำ")}</div>
-        <h3 class="title">${esc(product.title)}</h3>
-        <div class="meta">
-          <span>${product.rating ? `★ ${esc(product.rating)}` : ""}</span>
-          <span>${esc(formatSold(product.sold))}</span>
-        </div>
-        <div class="price">${esc(formatPrice(product.price))}</div>
-        <a class="primary buy" href="${esc(product.link)}"
-          target="_blank" rel="nofollow sponsored noopener"
-          data-product="${esc(product.title)}">ดูสินค้าใน Shopee</a>
-      </div>
-    </article>
-  `).join("");
+  grid.innerHTML = visible.map(productCard).join("");
 
   empty.hidden = visible.length > 0;
+  return visible.length;
+}
+
+function renderDiscovery() {
+  const popular = [...products]
+    .sort((a, b) => (Number(b.sold) || 0) - (Number(a.sold) || 0))
+    .slice(0, 4);
+  popularGrid.innerHTML = popular.map(productCard).join("");
+
+  try {
+    const recent = JSON.parse(localStorage.getItem("pickoraRecentlyViewed") || "[]")
+      .filter(item => item?.id && item?.url)
+      .slice(0, 4);
+    recentlyViewed.hidden = recent.length === 0;
+    recentGrid.innerHTML = recent.map(productCard).join("");
+  } catch {
+    recentlyViewed.hidden = true;
+  }
 }
 
 async function loadProducts() {
@@ -94,26 +138,33 @@ async function loadProducts() {
 
   if (statusResponse && statusResponse.ok) {
     const status = await statusResponse.json();
+    const updatedAt = new Date(status.updatedAt);
+    const stale = Date.now() - updatedAt.getTime() > 48 * 60 * 60 * 1000;
     feedStatus.textContent =
-      `อัปเดตล่าสุด ${new Date(status.updatedAt).toLocaleString("th-TH")} · ${products.length.toLocaleString("th-TH")} สินค้า`;
+      `${stale ? "⚠️ ข้อมูลอาจไม่ล่าสุด · " : ""}อัปเดตล่าสุด ${updatedAt.toLocaleString("th-TH")} · ${products.length.toLocaleString("th-TH")} สินค้า`;
+    feedStatus.classList.toggle("stale-status", stale);
   } else {
     feedStatus.textContent = `${products.length.toLocaleString("th-TH")} สินค้า`;
   }
 
   renderFilters();
   renderProducts();
+  renderDiscovery();
 }
 
-search.addEventListener("input", renderProducts);
-
-document.addEventListener("click", event => {
-  const link = event.target.closest("[data-product]");
-  if (!link) return;
-  const stats = JSON.parse(localStorage.getItem("pickoraClicks") || "{}");
-  const name = link.dataset.product;
-  stats[name] = (stats[name] || 0) + 1;
-  localStorage.setItem("pickoraClicks", JSON.stringify(stats));
+search.addEventListener("input", () => {
+  const resultCount = renderProducts();
+  clearTimeout(searchAnalyticsTimer);
+  const term = search.value.trim();
+  if (term.length >= 2) {
+    searchAnalyticsTimer = setTimeout(() => {
+      document.dispatchEvent(new CustomEvent("pickora:search", {
+        detail: {term, resultCount, category: activeCategory, sort: sort.value}
+      }));
+    }, 800);
+  }
 });
+sort.addEventListener("change", renderProducts);
 
 document.getElementById("year").textContent = new Date().getFullYear();
 

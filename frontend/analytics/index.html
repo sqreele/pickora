@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Analytics Dashboard | Pickora</title>
+  <meta name="description" content="แดชบอร์ดข้อมูล GA4 สำหรับผู้ดูแล Pickora">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/analytics/dashboard.css?v=2">
+  <link rel="stylesheet" href="/analytics/dashboard-state.css?v=2">
+</head>
+<body class="analytics-body">
+  <header class="header">
+    <div class="container nav">
+      <a class="brand" href="/"><span class="logo">P</span><span>Pickora</span></a>
+      <span class="admin-label">Analytics</span>
+    </div>
+  </header>
+
+  <main class="analytics-main">
+    <section id="authPanel" class="auth-card" hidden>
+      <span class="pill">Private dashboard</span>
+      <h1>เข้าสู่ Analytics</h1>
+      <p>ใช้ access token สำหรับผู้ดูแล ระบบจะแลก token เป็น session cookie แบบ HttpOnly และไม่ส่ง token ให้ JavaScript</p>
+      <div id="authMessage" class="state-message state-error" hidden></div>
+      <form action="/api/analytics/login" method="post" class="login-form">
+        <label for="dashboardToken">Dashboard access token</label>
+        <input id="dashboardToken" name="token" type="password" autocomplete="current-password" required autofocus>
+        <button class="primary" type="submit">เข้าสู่ Dashboard</button>
+      </form>
+      <a class="back-link" href="/">← กลับหน้าแรก</a>
+    </section>
+
+    <section id="dashboard" class="dashboard-shell" hidden>
+      <div class="dashboard-heading">
+        <div>
+          <span class="pill">GA4 Data API</span>
+          <h1>Analytics Dashboard</h1>
+          <p id="rangeDescription">ข้อมูลถึงเมื่อวาน · 28 วันที่ผ่านมา</p>
+        </div>
+        <div class="dashboard-actions">
+          <div class="date-presets" aria-label="เลือกช่วงวันที่">
+            <button type="button" data-days="7">7 วัน</button>
+            <button type="button" data-days="28" class="active">28 วัน</button>
+            <button type="button" data-days="90">90 วัน</button>
+          </div>
+          <button id="logoutButton" class="logout-button" type="button">ออกจากระบบ</button>
+        </div>
+      </div>
+
+      <div id="loadingState" class="state-panel" hidden>
+        <span class="spinner" aria-hidden="true"></span><strong>กำลังโหลดข้อมูลจาก GA4...</strong>
+      </div>
+      <div id="errorState" class="state-panel state-error" hidden>
+        <strong id="errorTitle">โหลดข้อมูลไม่สำเร็จ</strong>
+        <span id="errorDetail"></span>
+        <button id="retryButton" type="button">ลองอีกครั้ง</button>
+      </div>
+      <div id="emptyState" class="state-panel" hidden>
+        <strong>ยังไม่มีข้อมูลในช่วงเวลานี้</strong>
+        <span>ลองเลือกช่วง 28 หรือ 90 วัน หรือตรวจว่า GA4 property มีข้อมูลแล้ว</span>
+      </div>
+
+      <div id="reportContent" hidden>
+        <section class="metric-grid" aria-label="ตัวเลขภาพรวม">
+          <article class="metric-card"><span>Active users</span><strong id="activeUsers">0</strong></article>
+          <article class="metric-card"><span>Sessions</span><strong id="sessions">0</strong></article>
+          <article class="metric-card"><span>Page views</span><strong id="pageViews">0</strong></article>
+          <article class="metric-card"><span>Engagement rate</span><strong id="engagementRate">0%</strong></article>
+          <article class="metric-card accent-card"><span>Affiliate / outbound clicks</span><strong id="affiliateClicks">0</strong></article>
+        </section>
+
+        <section class="dashboard-card trend-card">
+          <div class="card-heading"><div><h2>Daily trend</h2><p>Users, sessions และ page views รายวัน</p></div></div>
+          <div id="trendChart" class="trend-chart" role="img" aria-label="กราฟแนวโน้มรายวัน"></div>
+          <div class="chart-legend"><span class="users-dot">Users</span><span class="sessions-dot">Sessions</span><span class="views-dot">Page views</span></div>
+        </section>
+
+        <div class="dashboard-columns">
+          <section class="dashboard-card">
+            <div class="card-heading"><div><h2>Top landing pages</h2><p>เรียงตาม sessions</p></div></div>
+            <div class="table-wrap"><table><thead><tr><th>Landing page</th><th>Sessions</th><th>Users</th><th>Views</th><th>Engagement</th></tr></thead><tbody id="landingRows"></tbody></table></div>
+          </section>
+          <section class="dashboard-card">
+            <div class="card-heading"><div><h2>Traffic source / medium</h2><p>ช่องทางที่พาผู้ใช้เข้ามา</p></div></div>
+            <div class="table-wrap"><table><thead><tr><th>Source / medium</th><th>Sessions</th><th>Users</th><th>Engagement</th></tr></thead><tbody id="trafficRows"></tbody></table></div>
+          </section>
+        </div>
+
+        <section class="dashboard-card">
+          <div class="card-heading"><div><h2>Click events</h2><p>affiliate_click, outbound_click และ GA4 click events</p></div></div>
+          <div id="eventGrid" class="event-grid"></div>
+        </section>
+      </div>
+    </section>
+  </main>
+  <script src="/analytics/dashboard.js?v=2"></script>
+</body>
+</html>

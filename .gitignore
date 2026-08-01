@@ -6,3 +6,26 @@ public/feed-status.json
 __pycache__/
 *.pyc
 .DS_Store
+.env
+.env.*
+!.env.example
+
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+google-service-account.json
+*.service-account.json
+*credentials*.json
+
+# Runtime storage
+data/
+
+# Generated public data
+public/analytics-summary.json
+public/link-health.json
+public/price-history.json
+public/seo-status.json
+public/sitemap.xml
+public/categories/
+public/products/
