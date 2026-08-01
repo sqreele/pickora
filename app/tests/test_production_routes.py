@@ -40,7 +40,7 @@ class ProductionRouteTest(unittest.TestCase):
             'location ~ "^/products/([a-f0-9]{16})/?$" {', 1
         )[1].split("}", 1)[0]
         self.assertIn(
-            "alias /usr/share/nginx/html/data/products/$1/index.html;",
+            "try_files /data/products/$1/index.html =404;",
             product_block,
         )
         self.assertIn("default_type text/html;", product_block)
@@ -54,10 +54,10 @@ class ProductionRouteTest(unittest.TestCase):
         self.assertIn(f"./public:{public_root}:ro", compose)
         self.assertIn(f"alias {public_root}/;", nginx)
         self.assertIn(
-            f"alias {public_root}/products/$1/index.html;", nginx
+            "try_files /data/products/$1/index.html =404;", nginx
         )
         self.assertIn(
-            f"alias {public_root}/categories/$1/index.html;", nginx
+            "try_files /data/categories/$1/index.html =404;", nginx
         )
 
     def test_dashboard_hidden_states_cannot_be_overridden(self):

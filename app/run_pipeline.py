@@ -435,6 +435,11 @@ def write_product_pages_and_sitemap(products: list[dict[str, object]]) -> None:
     PUBLIC_DIR.mkdir(parents=True, exist_ok=True)
     temporary_pages = Path(tempfile.mkdtemp(prefix="products-", dir=PUBLIC_DIR))
     temporary_categories = Path(tempfile.mkdtemp(prefix="categories-", dir=PUBLIC_DIR))
+    # mkdtemp intentionally creates directories with mode 0700. These directories
+    # become the public document roots below, so the unprivileged nginx worker
+    # must be able to traverse them after the atomic rename.
+    temporary_pages.chmod(0o755)
+    temporary_categories.chmod(0o755)
     products_by_category: dict[str, list[dict[str, object]]] = {}
     for product in products:
         category = str(product.get("category") or "สินค้าแนะนำ")
