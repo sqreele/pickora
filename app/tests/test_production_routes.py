@@ -39,9 +39,26 @@ class ProductionRouteTest(unittest.TestCase):
         product_block = nginx.split(
             'location ~ "^/products/([a-f0-9]{16})/?$" {', 1
         )[1].split("}", 1)[0]
-        self.assertIn("try_files /data/products/$1/index.html =404;", product_block)
+        self.assertIn(
+            "alias /usr/share/nginx/html/data/products/$1/index.html;",
+            product_block,
+        )
+        self.assertIn("default_type text/html;", product_block)
         self.assertIn("location /products/ {", nginx)
         self.assertNotIn("try_files $uri $uri/ /index.html", product_block)
+
+    def test_generated_routes_use_the_mounted_public_data_directory(self):
+        nginx = (ROOT / "nginx/default.conf").read_text(encoding="utf-8")
+        compose = (ROOT / "docker-compose.yml").read_text(encoding="utf-8")
+        public_root = "/usr/share/nginx/html/data"
+        self.assertIn(f"./public:{public_root}:ro", compose)
+        self.assertIn(f"alias {public_root}/;", nginx)
+        self.assertIn(
+            f"alias {public_root}/products/$1/index.html;", nginx
+        )
+        self.assertIn(
+            f"alias {public_root}/categories/$1/index.html;", nginx
+        )
 
     def test_dashboard_hidden_states_cannot_be_overridden(self):
         css = (
