@@ -49,6 +49,16 @@ class ProductionRouteTest(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertIn("display: none !important", css)
 
+    def test_manual_update_rebuilds_pipeline_image_before_worker(self):
+        script = (ROOT / "scripts/update-now.sh").read_text(encoding="utf-8")
+        build = script.index("docker compose build scheduler")
+        worker = script.index("docker compose run --rm worker")
+        recreate = script.index(
+            "docker compose up -d --force-recreate scheduler web"
+        )
+        self.assertLess(build, worker)
+        self.assertLess(worker, recreate)
+
 
 if __name__ == "__main__":
     unittest.main()
