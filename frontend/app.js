@@ -33,10 +33,17 @@ function formatSold(value) {
   return `ขายแล้ว ${number.toLocaleString("th-TH")}`;
 }
 
+function productDetailUrl(product) {
+  if (product.detailUrl) return product.detailUrl;
+  if (/^[a-f0-9]{16}$/.test(product.id || "")) return `/products/${product.id}/`;
+  return product.url || "/#products";
+}
+
 function productCard(product) {
+  const detailUrl = productDetailUrl(product);
   return `
     <article class="card">
-      <a class="card-image-link" href="${esc(product.detailUrl || product.url)}"><img src="${esc(product.image)}" alt="${esc(product.title)}" loading="lazy" decoding="async" width="600" height="600"
+      <a class="card-image-link" href="${esc(detailUrl)}"><img src="${esc(product.image)}" alt="${esc(product.title)}" loading="lazy" decoding="async" width="600" height="600"
         onerror="this.src='https://placehold.co/800x800?text=Pickora'"></a>
       <div class="card-body">
         ${product.categoryUrl ? `<a class="category" href="${esc(product.categoryUrl)}">${esc(product.category || "สินค้าแนะนำ")}</a>` : ""}
@@ -44,7 +51,7 @@ function productCard(product) {
         <div class="meta"><span>${product.rating ? `★ ${esc(product.rating)}` : ""}</span><span>${esc(formatSold(product.sold))}</span></div>
         ${product.pickoraScore || product.score ? `<div class="score-badge">Pickora Score ${esc(product.pickoraScore || product.score)}</div>` : ""}
         <div class="price">${esc(formatPrice(product.price))}</div>
-        <a class="primary buy" href="${esc(product.detailUrl || product.url)}" aria-label="ดูรายละเอียด ${esc(product.title)}">ดูรายละเอียด <span aria-hidden="true">→</span></a>
+        <a class="primary buy" href="${esc(detailUrl)}" aria-label="ดูรายละเอียด ${esc(product.title)}">ดูรายละเอียด <span aria-hidden="true">→</span></a>
       </div>
     </article>`;
 }
