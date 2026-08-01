@@ -11,7 +11,51 @@ APP_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(APP_DIR))
 
 import run_pipeline  # noqa: E402
-from run_pipeline import display_category  # noqa: E402
+from run_pipeline import (  # noqa: E402
+    display_category,
+    normalise_product_text,
+    repair_mojibake,
+)
+
+
+class RepairMojibakeTest(unittest.TestCase):
+    def test_preserves_correct_thai(self):
+        value = "VFOODS วีฟู้ดส์"
+        self.assertEqual(repair_mojibake(value), value)
+
+    def test_repairs_thai_mojibake(self):
+        broken = "VFOODS à¸§à¸µà¸à¸¹à¹à¸à¸ªà¹"
+        self.assertEqual(repair_mojibake(broken), "VFOODS วีฟู้ดส์")
+
+    def test_preserves_english(self):
+        self.assertEqual(repair_mojibake("VFOODS snack"), "VFOODS snack")
+
+    def test_preserves_non_string_values(self):
+        for value in (None, 42, 3.5, {"title": "value"}):
+            with self.subTest(value=value):
+                self.assertIs(repair_mojibake(value), value)
+
+    def test_unrecoverable_marker_string_does_not_raise(self):
+        value = "invalid à¸ text \N{SNOWMAN}"
+        self.assertEqual(repair_mojibake(value), value)
+
+    def test_normalises_all_product_text_fields(self):
+        broken = "à¸§à¸µà¸à¸¹à¹à¸à¸ªà¹"
+        product = {
+            "title": f"VFOODS {broken}",
+            "category": broken,
+            "shop": broken,
+            "description": f"Details {broken}",
+            "price": 99,
+        }
+
+        normalise_product_text(product)
+
+        self.assertEqual(product["title"], "VFOODS วีฟู้ดส์")
+        self.assertEqual(product["category"], "วีฟู้ดส์")
+        self.assertEqual(product["shop"], "วีฟู้ดส์")
+        self.assertEqual(product["description"], "Details วีฟู้ดส์")
+        self.assertEqual(product["price"], 99)
 
 
 class DisplayCategoryTest(unittest.TestCase):
