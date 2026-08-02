@@ -22,6 +22,7 @@ class PageParser(HTMLParser):
         self.meta: dict[str, str] = {}
         self.canonical = ""
         self.links: list[str] = []
+        self.h1_count = 0
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         values = dict(attrs)
@@ -35,6 +36,8 @@ class PageParser(HTMLParser):
             self.canonical = values.get("href") or ""
         elif tag == "a" and values.get("href"):
             self.links.append(values["href"] or "")
+        elif tag == "h1":
+            self.h1_count += 1
 
     def handle_endtag(self, tag: str) -> None:
         if tag == "title":
@@ -59,6 +62,8 @@ def local_target_exists(href: str) -> bool:
 
 def main() -> int:
     errors: list[str] = []
+    seen_titles: dict[str, Path] = {}
+    seen_canonicals: dict[str, Path] = {}
     pages = sorted(FRONTEND.rglob("*.html"))
     for page in pages:
         relative = page.relative_to(ROOT)
@@ -68,12 +73,26 @@ def main() -> int:
         noindex = "noindex" in parser.meta.get("robots", "").lower()
         if not parser.title.strip():
             errors.append(f"{relative}: missing title")
+        elif parser.title.strip() in seen_titles:
+            errors.append(
+                f"{relative}: duplicate title also used by {seen_titles[parser.title.strip()]}"
+            )
+        else:
+            seen_titles[parser.title.strip()] = relative
         if not parser.meta.get("description", "").strip():
             errors.append(f"{relative}: missing meta description")
         if not noindex and not parser.canonical:
             errors.append(f"{relative}: missing canonical")
         if parser.canonical and not parser.canonical.startswith("https://"):
             errors.append(f"{relative}: canonical must use HTTPS")
+        if parser.canonical in seen_canonicals:
+            errors.append(
+                f"{relative}: duplicate canonical also used by {seen_canonicals[parser.canonical]}"
+            )
+        elif parser.canonical:
+            seen_canonicals[parser.canonical] = relative
+        if not noindex and parser.h1_count != 1:
+            errors.append(f"{relative}: expected one h1, found {parser.h1_count}")
         for href in parser.links:
             if href.startswith("/") and not local_target_exists(href):
                 errors.append(f"{relative}: broken internal link {href}")

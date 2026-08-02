@@ -3,6 +3,10 @@
   <url><loc>https://pickora.hotelcarepro.com/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
   <url><loc>https://pickora.hotelcarepro.com/about/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://pickora.hotelcarepro.com/affiliate-disclosure/</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://pickora.hotelcarepro.com/guides/</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://pickora.hotelcarepro.com/compare-products/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://pickora.hotelcarepro.com/methodology/</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://pickora.hotelcarepro.com/privacy/</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
   <url><loc>https://pickora.hotelcarepro.com/reviews/portable-fan.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://pickora.hotelcarepro.com/reviews/power-bank.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://pickora.hotelcarepro.com/reviews/robot-vacuum.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>

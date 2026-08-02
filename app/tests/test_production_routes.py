@@ -53,6 +53,7 @@ class ProductionRouteTest(unittest.TestCase):
         public_root = "/usr/share/nginx/html/data"
         self.assertIn(f"./public:{public_root}:ro", compose)
         self.assertIn(f"alias {public_root}/;", nginx)
+        self.assertIn(f"alias {public_root}/sitemap.xml;", nginx)
         self.assertIn(
             "try_files /data/products/$1/index.html =404;", nginx
         )

@@ -159,4 +159,5 @@ Run automated checks:
 ```bash
 python -m unittest discover -s app/tests -v
 python3 scripts/seo-audit.py
+python3 scripts/production-seo-audit.py https://pickora.hotelcarepro.com
 ```

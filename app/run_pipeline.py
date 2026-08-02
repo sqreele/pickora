@@ -68,6 +68,8 @@ STATIC_SITEMAP_PATHS = (
     ("/guides/", "weekly", "0.8"),
     ("/compare-products/", "monthly", "0.5"),
     ("/affiliate-disclosure/", "yearly", "0.4"),
+    ("/methodology/", "yearly", "0.5"),
+    ("/privacy/", "yearly", "0.3"),
     ("/reviews/portable-fan.html", "monthly", "0.7"),
     ("/reviews/power-bank.html", "monthly", "0.7"),
     ("/reviews/robot-vacuum.html", "monthly", "0.7"),
@@ -416,7 +418,7 @@ def create_product_page(
 <section class="related-products"><h2>สินค้าที่เกี่ยวข้อง</h2><div class="grid">{related_html}</div></section>
 <p class="more-guides"><a href="/guides/">อ่านคู่มือเลือกซื้อและบทความเปรียบเทียบเพิ่มเติม →</a></p>
 </article></main>
-<footer><div class="container">Pickora · <a href="/affiliate-disclosure/">Affiliate Disclosure</a></div></footer>
+<footer><div class="container">Pickora · <a href="/methodology/">วิธีคัดเลือกสินค้า</a> · <a href="/privacy/">ความเป็นส่วนตัว</a> · <a href="/affiliate-disclosure/">Affiliate Disclosure</a></div></footer>
 <script type="application/json" id="product-context">{product_context}</script>
 </body></html>"""
 
@@ -459,7 +461,7 @@ def create_category_page(
 <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">หน้าแรก</a> / <span aria-current="page">{html.escape(category)}</span></nav>
 <div class="category-header"><h1>{html.escape(category)}</h1><p>พบ {len(products):,} สินค้าที่ระบบคัดไว้</p></div>
 <div class="grid">{cards}</div></div></section></main>
-<footer><div class="container">Pickora · <a href="/guides/">คู่มือเลือกซื้อ</a> · <a href="/affiliate-disclosure/">Affiliate Disclosure</a></div></footer>
+<footer><div class="container">Pickora · <a href="/guides/">คู่มือเลือกซื้อ</a> · <a href="/methodology/">วิธีคัดเลือกสินค้า</a> · <a href="/privacy/">ความเป็นส่วนตัว</a> · <a href="/affiliate-disclosure/">Affiliate Disclosure</a></div></footer>
 </body></html>"""
 
 
