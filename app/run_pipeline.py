@@ -418,7 +418,7 @@ def create_product_page(
 <section class="related-products"><h2>สินค้าที่เกี่ยวข้อง</h2><div class="grid">{related_html}</div></section>
 <p class="more-guides"><a href="/guides/">อ่านคู่มือเลือกซื้อและบทความเปรียบเทียบเพิ่มเติม →</a></p>
 </article></main>
-<footer><div class="container">Pickora · <a href="/methodology/">วิธีคัดเลือกสินค้า</a> · <a href="/privacy/">ความเป็นส่วนตัว</a> · <a href="/affiliate-disclosure/">Affiliate Disclosure</a></div></footer>
+<footer><div class="container"><a href="/">หน้าแรก</a> · <a href="/guides/">คู่มือ</a> · <a href="/about/">เกี่ยวกับเรา</a> · <a href="/methodology/">วิธีคัดเลือกสินค้า</a> · <a href="/privacy/">ความเป็นส่วนตัว</a> · <a href="/affiliate-disclosure/">Affiliate Disclosure</a></div></footer>
 <script type="application/json" id="product-context">{product_context}</script>
 </body></html>"""
 
@@ -461,7 +461,7 @@ def create_category_page(
 <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">หน้าแรก</a> / <span aria-current="page">{html.escape(category)}</span></nav>
 <div class="category-header"><h1>{html.escape(category)}</h1><p>พบ {len(products):,} สินค้าที่ระบบคัดไว้</p></div>
 <div class="grid">{cards}</div></div></section></main>
-<footer><div class="container">Pickora · <a href="/guides/">คู่มือเลือกซื้อ</a> · <a href="/methodology/">วิธีคัดเลือกสินค้า</a> · <a href="/privacy/">ความเป็นส่วนตัว</a> · <a href="/affiliate-disclosure/">Affiliate Disclosure</a></div></footer>
+<footer><div class="container"><a href="/">หน้าแรก</a> · <a href="/guides/">คู่มือ</a> · <a href="/about/">เกี่ยวกับเรา</a> · <a href="/methodology/">วิธีคัดเลือกสินค้า</a> · <a href="/privacy/">ความเป็นส่วนตัว</a> · <a href="/affiliate-disclosure/">Affiliate Disclosure</a></div></footer>
 </body></html>"""
 
 

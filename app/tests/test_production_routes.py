@@ -29,6 +29,25 @@ class ProductionRouteTest(unittest.TestCase):
         ):
             self.assertTrue((ROOT / path).is_file(), path)
 
+    def test_public_pages_have_consistent_trust_navigation(self):
+        required_links = (
+            'href="/"',
+            'href="/guides/"',
+            'href="/about/"',
+            'href="/methodology/"',
+            'href="/privacy/"',
+            'href="/affiliate-disclosure/"',
+        )
+        frontend = ROOT / "frontend"
+        for page in frontend.rglob("*.html"):
+            if frontend / "analytics" in page.parents:
+                continue
+            source = page.read_text(encoding="utf-8")
+            footer = source.split("<footer", 1)[1].split("</footer>", 1)[0]
+            for link in required_links:
+                with self.subTest(page=page.relative_to(ROOT), link=link):
+                    self.assertIn(link, footer)
+
     def test_quantified_location_regexes_are_quoted_for_nginx(self):
         nginx = (ROOT / "nginx/default.conf").read_text(encoding="utf-8")
         self.assertIn('location ~ "^/products/([a-f0-9]{16})/?$" {', nginx)
