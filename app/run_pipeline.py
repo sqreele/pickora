@@ -117,7 +117,6 @@ def normalise_product_text(product: dict[str, object]) -> None:
         if field in product:
             product[field] = repair_mojibake(product[field])
 
-
 def normalise(value: str) -> str:
     return (
         str(value)
@@ -262,7 +261,6 @@ def display_category(value: object) -> str:
     } or category == "ต่างด้าว":
         return "สินค้าแนะนำ"
     return category
-
 
 def safe_external_url(value: object) -> str:
     url = str(value).strip()

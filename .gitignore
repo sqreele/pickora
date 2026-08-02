@@ -9,7 +9,6 @@ __pycache__/
 .env
 .env.*
 !.env.example
-
 # Local environment and credentials
 .env
 .env.*

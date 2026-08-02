@@ -59,7 +59,6 @@ class ProductionRouteTest(unittest.TestCase):
         self.assertIn(
             "try_files /data/categories/$1/index.html =404;", nginx
         )
-
     def test_dashboard_hidden_states_cannot_be_overridden(self):
         css = (
             ROOT / "frontend/analytics/dashboard-state.css"
@@ -75,7 +74,6 @@ class ProductionRouteTest(unittest.TestCase):
         )
         self.assertLess(build, worker)
         self.assertLess(worker, recreate)
-
 
 if __name__ == "__main__":
     unittest.main()
