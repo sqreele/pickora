@@ -48,6 +48,11 @@ class ProductionRouteTest(unittest.TestCase):
                 with self.subTest(page=page.relative_to(ROOT), link=link):
                     self.assertIn(link, footer)
 
+    def test_homepage_script_tolerates_optional_footer_year(self):
+        script = (ROOT / "frontend/app.js").read_text(encoding="utf-8")
+        self.assertIn('const year = document.getElementById("year");', script)
+        self.assertIn("if (year) year.textContent", script)
+
     def test_quantified_location_regexes_are_quoted_for_nginx(self):
         nginx = (ROOT / "nginx/default.conf").read_text(encoding="utf-8")
         self.assertIn('location ~ "^/products/([a-f0-9]{16})/?$" {', nginx)

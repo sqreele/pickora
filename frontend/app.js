@@ -183,7 +183,8 @@ search.addEventListener("input", () => {
 });
 sort.addEventListener("change", renderProducts);
 
-document.getElementById("year").textContent = new Date().getFullYear();
+const year = document.getElementById("year");
+if (year) year.textContent = new Date().getFullYear();
 
 loadProducts().catch(error => {
   console.error(error);
