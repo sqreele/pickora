@@ -21,10 +21,16 @@ function esc(value) {
     .replaceAll("'", "&#039;");
 }
 
-function formatPrice(value) {
+function formatPrice(value, maximumValue) {
   const number = Number(value);
   if (!Number.isFinite(number) || number <= 0) return "ดูราคาล่าสุด";
-  return `฿${number.toLocaleString("th-TH", {maximumFractionDigits: 0})}`;
+  const maximum = Number(maximumValue);
+  const minimumText = number.toLocaleString("th-TH", {maximumFractionDigits: 0});
+  if (Number.isFinite(maximum) && maximum > number) {
+    const maximumText = maximum.toLocaleString("th-TH", {maximumFractionDigits: 0});
+    return `ราคาอ้างอิง ฿${minimumText}–฿${maximumText}`;
+  }
+  return `ราคาอ้างอิง ฿${minimumText}`;
 }
 
 function formatSold(value) {
@@ -60,7 +66,8 @@ function productCard(product) {
         <h3 class="title">${esc(product.title)}</h3>
         <div class="meta"><span>${product.rating ? `★ ${esc(product.rating)}` : ""}</span><span>${esc(formatSold(product.sold))}</span></div>
         ${product.pickoraScore || product.score ? `<div class="score-badge">Pickora Score ${esc(product.pickoraScore || product.score)}</div>` : ""}
-        <div class="price">${esc(formatPrice(product.price))}</div>
+        <div class="price">${esc(formatPrice(product.price, product.priceMax))}</div>
+        ${Number(product.price) > 0 ? '<small class="price-note">โปรโมชันจริงอาจต่ำกว่านี้</small>' : ""}
         <a class="primary buy" href="${esc(detailUrl)}" aria-label="ดูรายละเอียด ${esc(product.title)}">ดูรายละเอียด <span aria-hidden="true">→</span></a>
       </div>
     </article>`;

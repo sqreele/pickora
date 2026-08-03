@@ -100,5 +100,12 @@ class ProductionRouteTest(unittest.TestCase):
         self.assertLess(build, worker)
         self.assertLess(worker, recreate)
 
+    def test_scheduler_refreshes_feed_every_two_hours_by_default(self):
+        scheduler = (ROOT / "app/scheduler.py").read_text(encoding="utf-8")
+        example_env = (ROOT / ".env.example").read_text(encoding="utf-8")
+        self.assertIn('os.getenv("SYNC_INTERVAL_HOURS", "2")', scheduler)
+        self.assertIn("schedule.every(SYNC_INTERVAL_HOURS).hours", scheduler)
+        self.assertIn("SYNC_INTERVAL_HOURS=2", example_env)
+
 if __name__ == "__main__":
     unittest.main()

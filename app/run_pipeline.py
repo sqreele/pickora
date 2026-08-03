@@ -380,7 +380,13 @@ def update_price_history(products: list[dict[str, object]]) -> None:
 def product_card(product: dict[str, object]) -> str:
     title = str(product["title"])
     price = float(product.get("price") or 0)
-    price_text = f"฿{price:,.0f}" if price > 0 else "ดูราคาล่าสุด"
+    price_max = max(price, float(product.get("priceMax") or 0))
+    price_text = (
+        f"ราคาอ้างอิง ฿{price:,.0f}–฿{price_max:,.0f}"
+        if price > 0 and price_max > price
+        else f"ราคาอ้างอิง ฿{price:,.0f}"
+        if price > 0 else "ดูราคาล่าสุด"
+    )
     pickora_score = int(product.get("pickoraScore") or 0)
     return f"""<article class="card related-card">
 <a class="card-image-link" href="{html.escape(str(product['detailUrl']), quote=True)}">
@@ -389,6 +395,7 @@ def product_card(product: dict[str, object]) -> str:
 <h3 class="title"><a href="{html.escape(str(product['detailUrl']), quote=True)}">{html.escape(title)}</a></h3>
 <div class="score-badge" title="คำนวณจากคะแนน ยอดขาย ส่วนลด และข้อมูล Affiliate">Pickora Score {pickora_score}</div>
 <div class="price">{html.escape(price_text)}</div>
+{f'<small class="price-note">โปรโมชันจริงอาจต่ำกว่านี้</small>' if price > 0 else ''}
 <a class="primary buy" href="{html.escape(str(product['detailUrl']), quote=True)}">ดูรายละเอียด →</a></div></article>"""
 
 
@@ -420,10 +427,20 @@ def create_product_page(
     category = str(product.get("category") or "สินค้าแนะนำ")
     shop = str(product.get("shop") or "")
     price = float(product.get("price") or 0)
+    price_max = max(price, float(product.get("priceMax") or 0))
     rating = float(product.get("rating") or 0)
     sold = int(float(product.get("sold") or 0))
     pickora_score = int(product.get("pickoraScore") or 0)
-    price_text = f"฿{price:,.0f}" if price > 0 else "ดูราคาล่าสุด"
+    price_text = (
+        f"ราคาอ้างอิง ฿{price:,.0f}–฿{price_max:,.0f}"
+        if price > 0 and price_max > price
+        else f"ราคาอ้างอิง ฿{price:,.0f}"
+        if price > 0 else "ดูราคาล่าสุด"
+    )
+    price_updated_at = str(product.get("priceUpdatedAt") or "")
+    price_note = "โปรโมชันจริงอาจต่ำกว่านี้ ราคานี้เป็นข้อมูลอ้างอิงจาก Affiliate Feed"
+    if price_updated_at:
+        price_note += f" · อัปเดต {price_updated_at}"
     meta = []
     if rating > 0:
         meta.append(f"★ {rating:g}")
@@ -434,7 +451,13 @@ def create_product_page(
         "image": images, "category": category, "url": canonical,
         "description": description,
     }
-    if price > 0:
+    if price > 0 and price_max > price:
+        schema["offers"] = {
+            "@type": "AggregateOffer", "url": canonical,
+            "priceCurrency": "THB", "lowPrice": f"{price:.2f}",
+            "highPrice": f"{price_max:.2f}",
+        }
+    elif price > 0:
         schema["offers"] = {
             "@type": "Offer", "url": canonical, "priceCurrency": "THB",
             "price": f"{price:.2f}",
@@ -492,6 +515,7 @@ def create_product_page(
 <p class="product-shop">{html.escape(shop)}</p><p>{html.escape(" · ".join(meta))}</p>
 <div class="product-score"><strong>{pickora_score}</strong><span>Pickora Score<small>คำนวณจากคะแนน ยอดขาย ส่วนลด และข้อมูล Affiliate</small></span></div>
 <div class="product-detail-price">{html.escape(price_text)}</div>
+{f'<p class="product-price-note">{html.escape(price_note)}</p>' if price > 0 else ''}
 <p class="affiliate-inline">ลิงก์ด้านล่างเป็น Affiliate link ราคา สต็อก และโปรโมชันอาจเปลี่ยนแปลง โปรดตรวจสอบบนหน้าร้านก่อนสั่งซื้อ</p>
 <a class="primary product-buy" href="{html.escape(affiliate_link, quote=True)}" target="_blank" rel="nofollow sponsored noopener noreferrer" data-affiliate-link data-product-id="{html.escape(str(product.get('externalId') or product['id']), quote=True)}" data-product-name="{html.escape(title, quote=True)}" data-shop-id="{html.escape(str(product.get('shopId') or ''), quote=True)}" data-placement="product-detail">เช็กราคาล่าสุดใน Shopee →</a>
 <button class="secondary-action" type="button" data-compare-product="{html.escape(str(product['id']), quote=True)}">เพิ่มเพื่อเปรียบเทียบ</button>
@@ -684,10 +708,14 @@ def process_feed() -> None:
         price_cols = [
             column
             for candidate in (
-                "sale_price", "current_price", "price", "product_price"
+                "sale_price", "current_price", "price_min", "min_price",
+                "lowest_price", "discounted_price", "price", "product_price",
             )
             if (column := find_column(columns, [candidate])) is not None
         ]
+        price_max_col = find_column(columns, [
+            "price_max", "max_price", "highest_price",
+        ])
         rating_col = find_column(columns, [
             "rating", "item_rating", "product_rating"
         ])
@@ -740,6 +768,14 @@ def process_feed() -> None:
                 filtered["_price"] > 0,
                 candidate_price.where(candidate_price > 0, 0),
             )
+        filtered["_price_max"] = (
+            numeric(filtered[price_max_col]) if price_max_col
+            else filtered["_price"]
+        )
+        filtered["_price_max"] = filtered["_price_max"].where(
+            filtered["_price_max"] >= filtered["_price"],
+            filtered["_price"],
+        )
         filtered["_rating"] = numeric(filtered[rating_col]) if rating_col else 0
         filtered["_sold"] = numeric(filtered[sold_col]) if sold_col else 0
         filtered["_discount"] = (
@@ -764,6 +800,7 @@ def process_feed() -> None:
             "image": filtered[image_col].astype(str),
             "productUrl": filtered[link_col].astype(str).str.strip(),
             "price": filtered["_price"].round(2),
+            "priceMax": filtered["_price_max"].round(2),
             "rating": filtered["_rating"].round(2),
             "sold": filtered["_sold"].round(0),
             "commission": None,
@@ -821,6 +858,7 @@ def process_feed() -> None:
     ]
     invalid_urls = len(all_records) - len(records)
     record_count = len(records)
+    price_updated_at = datetime.now().astimezone().strftime("%d/%m/%Y %H:%M")
     for rank, product in enumerate(records):
         normalise_product_text(product)
         images = product_images(product.get("image", ""))
@@ -851,6 +889,7 @@ def process_feed() -> None:
             100 if record_count == 1
             else round(100 - (rank / (record_count - 1)) * 50)
         )
+        product["priceUpdatedAt"] = price_updated_at
 
     update_price_history(records)
     write_product_pages_and_sitemap(records)

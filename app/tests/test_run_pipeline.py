@@ -106,6 +106,21 @@ class ProductImagesTest(unittest.TestCase):
         self.assertEqual(page.count("data-gallery-image="), 2)
         self.assertIn('<script src="/product-gallery.js"></script>', page)
 
+    def test_generated_product_page_labels_feed_price_as_reference(self):
+        product = {
+            "id": "0123456789abcdef", "title": "สินค้าทดสอบ",
+            "image": "https://cdn.example.com/one.jpg",
+            "link": "https://shopee.example.com/item",
+            "detailUrl": "/products/0123456789abcdef/",
+            "category": "ของใช้", "categoryUrl": "/categories/test/",
+            "price": 400, "priceHistory": [],
+        }
+
+        page = create_product_page(product, [])
+
+        self.assertIn("ราคาอ้างอิง ฿400", page)
+        self.assertIn("โปรโมชันจริงอาจต่ำกว่านี้", page)
+
 
 class RepairMojibakeTest(unittest.TestCase):
     def test_preserves_correct_thai(self):
@@ -191,11 +206,13 @@ class ProductGenerationTest(unittest.TestCase):
             public_dir.mkdir()
             feed = data_dir / "shopee_feed.csv"
             feed.write_text(
-                "title,image,product_link,itemid,shopid,price,sale_price,rating,sold\n"
+                "title,image,product_link,itemid,shopid,price,sale_price,price_min,price_max,rating,sold\n"
                 "Test product,https://cdn.example.com/a.jpg,"
-                "https://shopee.co.th/product/10/20,20,10,100,79,5,25\n"
+                "https://shopee.co.th/product/10/20,20,10,100,79,,,5,25\n"
                 "Regular price product,https://cdn.example.com/b.jpg,"
-                "https://shopee.co.th/product/10/21,21,10,100,,5,25\n",
+                "https://shopee.co.th/product/10/21,21,10,100,,,,5,25\n"
+                "Variant product,https://cdn.example.com/c.jpg,"
+                "https://shopee.co.th/product/10/22,22,10,400,,284,400,5,25\n",
                 encoding="utf-8",
             )
             paths = {
@@ -219,6 +236,9 @@ class ProductGenerationTest(unittest.TestCase):
             regular_price_product = next(
                 item for item in products if item["externalId"] == "21"
             )
+            variant_product = next(
+                item for item in products if item["externalId"] == "22"
+            )
             self.assertEqual(product["productUrl"], "https://shopee.co.th/product/10/20")
             self.assertEqual(product["link"], product["affiliateUrl"])
             self.assertIsNone(product["commission"])
@@ -227,6 +247,9 @@ class ProductGenerationTest(unittest.TestCase):
             self.assertEqual(product["shopId"], "10")
             self.assertEqual(product["price"], 79)
             self.assertEqual(regular_price_product["price"], 100)
+            self.assertEqual(variant_product["price"], 284)
+            self.assertEqual(variant_product["priceMax"], 400)
+            self.assertTrue(product["priceUpdatedAt"])
             self.assertIn('rel="nofollow sponsored noopener noreferrer"', (
                 paths["PRODUCT_PAGES_DIR"] / product["id"] / "index.html"
             ).read_text(encoding="utf-8"))
