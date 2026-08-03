@@ -191,9 +191,11 @@ class ProductGenerationTest(unittest.TestCase):
             public_dir.mkdir()
             feed = data_dir / "shopee_feed.csv"
             feed.write_text(
-                "title,image,product_link,itemid,shopid,price,rating,sold\n"
+                "title,image,product_link,itemid,shopid,price,sale_price,rating,sold\n"
                 "Test product,https://cdn.example.com/a.jpg,"
-                "https://shopee.co.th/product/10/20,20,10,100,5,25\n",
+                "https://shopee.co.th/product/10/20,20,10,100,79,5,25\n"
+                "Regular price product,https://cdn.example.com/b.jpg,"
+                "https://shopee.co.th/product/10/21,21,10,100,,5,25\n",
                 encoding="utf-8",
             )
             paths = {
@@ -212,13 +214,19 @@ class ProductGenerationTest(unittest.TestCase):
             ):
                 run_pipeline.process_feed()
 
-            product = json.loads(paths["PRODUCTS_FILE"].read_text(encoding="utf-8"))[0]
+            products = json.loads(paths["PRODUCTS_FILE"].read_text(encoding="utf-8"))
+            product = next(item for item in products if item["externalId"] == "20")
+            regular_price_product = next(
+                item for item in products if item["externalId"] == "21"
+            )
             self.assertEqual(product["productUrl"], "https://shopee.co.th/product/10/20")
             self.assertEqual(product["link"], product["affiliateUrl"])
             self.assertIsNone(product["commission"])
             self.assertEqual(product["commissionStatus"], "unknown")
             self.assertEqual(product["externalId"], "20")
             self.assertEqual(product["shopId"], "10")
+            self.assertEqual(product["price"], 79)
+            self.assertEqual(regular_price_product["price"], 100)
             self.assertIn('rel="nofollow sponsored noopener noreferrer"', (
                 paths["PRODUCT_PAGES_DIR"] / product["id"] / "index.html"
             ).read_text(encoding="utf-8"))

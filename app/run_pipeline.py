@@ -681,9 +681,13 @@ def process_feed() -> None:
         link_col = find_column(columns, [
             "product_link", "product_url", "item_url", "offer_link",
         ])
-        price_col = find_column(columns, [
-            "price", "sale_price", "current_price", "product_price"
-        ])
+        price_cols = [
+            column
+            for candidate in (
+                "sale_price", "current_price", "price", "product_price"
+            )
+            if (column := find_column(columns, [candidate])) is not None
+        ]
         rating_col = find_column(columns, [
             "rating", "item_rating", "product_rating"
         ])
@@ -729,14 +733,20 @@ def process_feed() -> None:
 
         filtered = keyword_filter(filtered, title_col)
 
-        filtered["_price"] = numeric(filtered[price_col]) if price_col else 0
+        filtered["_price"] = 0.0
+        for price_col in price_cols:
+            candidate_price = numeric(filtered[price_col])
+            filtered["_price"] = filtered["_price"].where(
+                filtered["_price"] > 0,
+                candidate_price.where(candidate_price > 0, 0),
+            )
         filtered["_rating"] = numeric(filtered[rating_col]) if rating_col else 0
         filtered["_sold"] = numeric(filtered[sold_col]) if sold_col else 0
         filtered["_discount"] = (
             numeric(filtered[discount_col]) if discount_col else 0
         )
 
-        if price_col:
+        if price_cols:
             filtered = filtered[filtered["_price"].between(MIN_PRICE, MAX_PRICE)]
         if rating_col:
             filtered = filtered[filtered["_rating"] >= MIN_RATING]
