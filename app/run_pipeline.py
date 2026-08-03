@@ -13,7 +13,7 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlencode, urlparse
 
 import pandas as pd
 import requests
@@ -61,7 +61,6 @@ EXCLUDE_KEYWORDS = [
 
 WEIGHT_SOLD = float(os.getenv("WEIGHT_SOLD", "0.50"))
 WEIGHT_RATING = float(os.getenv("WEIGHT_RATING", "1000"))
-WEIGHT_COMMISSION = float(os.getenv("WEIGHT_COMMISSION", "500"))
 WEIGHT_DISCOUNT = float(os.getenv("WEIGHT_DISCOUNT", "20"))
 
 STATIC_SITEMAP_PATHS = (
@@ -87,6 +86,53 @@ STATIC_SITEMAP_PATHS = (
 )
 
 PRODUCT_TEXT_FIELDS = ("title", "category", "shop", "description")
+SHOPEE_AFFILIATE_ENDPOINT = "https://s.shopee.co.th/an_redir"
+SHOPEE_PRODUCT_HOSTS = frozenset({"shopee.co.th", "www.shopee.co.th"})
+
+
+def build_shopee_affiliate_link(
+    product_url: str, affiliate_id: str, sub_id: str,
+) -> str:
+    """Build one validated Shopee Thailand affiliate redirect URL."""
+    product_url = str(product_url or "").strip()
+    if not product_url:
+        return ""
+
+    parsed = urlparse(product_url)
+    if (
+        parsed.scheme == "https"
+        and parsed.hostname == "s.shopee.co.th"
+        and parsed.path.rstrip("/") == "/an_redir"
+    ):
+        origins = parse_qs(parsed.query).get("origin_link", [])
+        if len(origins) != 1:
+            return ""
+        product_url = origins[0].strip()
+        parsed = urlparse(product_url)
+
+    if parsed.scheme != "https" or parsed.hostname not in SHOPEE_PRODUCT_HOSTS:
+        return ""
+    if not str(affiliate_id or "").strip():
+        raise ValueError("SHOPEE_AFFILIATE_ID is required to build affiliate links")
+
+    return f"{SHOPEE_AFFILIATE_ENDPOINT}?{urlencode({
+        'origin_link': product_url,
+        'affiliate_id': str(affiliate_id).strip(),
+        'sub_id': sanitise_sub_id(sub_id),
+    })}"
+
+
+def sanitise_sub_id(value: object, *, fallback: str = "product") -> str:
+    """Return a short ASCII Sub ID accepted by Shopee reporting."""
+    cleaned = re.sub(r"[^A-Za-z0-9_-]+", "-", str(value or "").strip())
+    cleaned = cleaned.strip("-_") or fallback
+    return cleaned[:100].rstrip("-_")
+
+
+def build_product_sub_id(prefix: str, item_id: object, fallback_id: str) -> str:
+    safe_prefix = sanitise_sub_id(prefix, fallback="pickora")[:32]
+    safe_identifier = sanitise_sub_id(item_id, fallback=fallback_id)[:48]
+    return sanitise_sub_id(f"{safe_prefix}-product-{safe_identifier}")
 
 
 def repair_mojibake(value: object) -> object:
@@ -447,7 +493,7 @@ def create_product_page(
 <div class="product-score"><strong>{pickora_score}</strong><span>Pickora Score<small>คำนวณจากคะแนน ยอดขาย ส่วนลด และข้อมูล Affiliate</small></span></div>
 <div class="product-detail-price">{html.escape(price_text)}</div>
 <p class="affiliate-inline">ลิงก์ด้านล่างเป็น Affiliate link ราคา สต็อก และโปรโมชันอาจเปลี่ยนแปลง โปรดตรวจสอบบนหน้าร้านก่อนสั่งซื้อ</p>
-<a class="primary product-buy" href="{html.escape(affiliate_link, quote=True)}" target="_blank" rel="nofollow sponsored noopener" data-affiliate-link data-product-id="{html.escape(str(product['id']), quote=True)}" data-product-name="{html.escape(title, quote=True)}">เช็กราคาล่าสุดใน Shopee →</a>
+<a class="primary product-buy" href="{html.escape(affiliate_link, quote=True)}" target="_blank" rel="nofollow sponsored noopener noreferrer" data-affiliate-link data-product-id="{html.escape(str(product.get('externalId') or product['id']), quote=True)}" data-product-name="{html.escape(title, quote=True)}" data-shop-id="{html.escape(str(product.get('shopId') or ''), quote=True)}" data-placement="product-detail">เช็กราคาล่าสุดใน Shopee →</a>
 <button class="secondary-action" type="button" data-compare-product="{html.escape(str(product['id']), quote=True)}">เพิ่มเพื่อเปรียบเทียบ</button>
 <div class="share-actions" aria-label="แชร์สินค้า">
 <button type="button" data-native-share data-share-title="{html.escape(title, quote=True)}" data-share-url="{html.escape(canonical, quote=True)}">แชร์</button>
@@ -590,6 +636,20 @@ def process_feed() -> None:
     PUBLIC_DIR.mkdir(parents=True, exist_ok=True)
     write_status("processing")
 
+    affiliate_id = os.getenv("SHOPEE_AFFILIATE_ID", "").strip()
+    sub_id_prefix = os.getenv("SHOPEE_SUB_ID_PREFIX", "pickora").strip()
+    pipeline_environment = os.getenv("PIPELINE_ENV", "production").strip().lower()
+    allow_untracked_links = pipeline_environment in {"development", "dev", "test"}
+    if not affiliate_id and not allow_untracked_links:
+        raise RuntimeError(
+            "SHOPEE_AFFILIATE_ID is required in production pipeline mode"
+        )
+    if not affiliate_id:
+        logging.warning(
+            "SHOPEE_AFFILIATE_ID is missing; development output will use "
+            "canonical, untracked Shopee product links"
+        )
+
     encoding = detect_encoding()
     separator = detect_separator(encoding)
     logging.info("Detected encoding=%s separator=%r", encoding, separator)
@@ -619,9 +679,7 @@ def process_feed() -> None:
             "imageurl",
         ])
         link_col = find_column(columns, [
-            "affiliate_link", "product_link", "offer_link", "item_url",
-            "product_url", "tracking_link", "affiliate_url",
-            "product_short_link"
+            "product_link", "product_url", "item_url", "offer_link",
         ])
         price_col = find_column(columns, [
             "price", "sale_price", "current_price", "product_price"
@@ -631,10 +689,6 @@ def process_feed() -> None:
         ])
         sold_col = find_column(columns, [
             "sold", "sales", "historical_sold", "item_sold", "sales_volume"
-        ])
-        commission_col = find_column(columns, [
-            "commission_rate", "commission", "commission_percentage",
-            "estimated_commission_rate"
         ])
         discount_col = find_column(columns, [
             "discount", "discount_percentage", "discount_rate"
@@ -646,8 +700,10 @@ def process_feed() -> None:
         shop_col = find_column(columns, [
             "shop_name", "seller_name", "merchant_name"
         ])
+        shop_id_col = find_column(columns, ["shopid", "shop_id", "seller_id"])
         product_id_col = find_column(columns, [
-            "product_id", "item_id", "offer_id", "sku_id", "product_sku"
+            "itemid", "item_id", "product_id", "offer_id", "sku_id",
+            "product_sku",
         ])
 
         if not title_col or not image_col or not link_col:
@@ -676,9 +732,6 @@ def process_feed() -> None:
         filtered["_price"] = numeric(filtered[price_col]) if price_col else 0
         filtered["_rating"] = numeric(filtered[rating_col]) if rating_col else 0
         filtered["_sold"] = numeric(filtered[sold_col]) if sold_col else 0
-        filtered["_commission"] = (
-            numeric(filtered[commission_col]) if commission_col else 0
-        )
         filtered["_discount"] = (
             numeric(filtered[discount_col]) if discount_col else 0
         )
@@ -693,18 +746,18 @@ def process_feed() -> None:
         filtered["_score"] = (
             filtered["_sold"].clip(upper=100000) * WEIGHT_SOLD
             + filtered["_rating"] * WEIGHT_RATING
-            + filtered["_commission"] * WEIGHT_COMMISSION
             + filtered["_discount"] * WEIGHT_DISCOUNT
         )
 
         output = pd.DataFrame({
             "title": filtered[title_col].astype(str),
             "image": filtered[image_col].astype(str),
-            "link": filtered[link_col].astype(str),
+            "productUrl": filtered[link_col].astype(str).str.strip(),
             "price": filtered["_price"].round(2),
             "rating": filtered["_rating"].round(2),
             "sold": filtered["_sold"].round(0),
-            "commission": filtered["_commission"].round(2),
+            "commission": None,
+            "commissionStatus": "unknown",
             "discount": filtered["_discount"].round(2),
             "score": filtered["_score"].round(2),
             "externalId": (
@@ -718,6 +771,10 @@ def process_feed() -> None:
             "shop": (
                 filtered[shop_col].astype(str)
                 if shop_col else ""
+            ),
+            "shopId": (
+                filtered[shop_id_col].astype(str)
+                if shop_id_col else ""
             ),
         })
 
@@ -736,7 +793,7 @@ def process_feed() -> None:
     external_ids = result["externalId"].astype(str).str.strip()
     result["_identity"] = external_ids.where(
         ~external_ids.str.lower().isin({"", "nan", "none", "null"}),
-        result["link"].astype(str),
+        result["productUrl"].astype(str),
     )
     result = (
         result
@@ -748,7 +805,8 @@ def process_feed() -> None:
     all_records = result.to_dict(orient="records")
     records = [
         product for product in all_records
-        if safe_external_url(product.get("link", ""))
+        if urlparse(str(product.get("productUrl", "")).strip()).scheme == "https"
+        and urlparse(str(product.get("productUrl", "")).strip()).hostname in SHOPEE_PRODUCT_HOSTS
         and product_images(product.get("image", ""))
     ]
     invalid_urls = len(all_records) - len(records)
@@ -762,9 +820,18 @@ def process_feed() -> None:
         identity = (
             f"feed:{external_id}"
             if external_id.lower() not in {"", "nan", "none", "null"}
-            else f"link:{product['link']}"
+            else f"link:{product['productUrl']}"
         )
         identifier = product_id(identity)
+        sub_id = build_product_sub_id(sub_id_prefix, external_id, identifier)
+        affiliate_url = (
+            build_shopee_affiliate_link(
+                str(product["productUrl"]), affiliate_id, sub_id,
+            )
+            if affiliate_id else str(product["productUrl"])
+        )
+        product["affiliateUrl"] = affiliate_url
+        product["link"] = affiliate_url
         category = display_category(product.get("category"))
         product["category"] = category
         product["id"] = identifier

@@ -10,6 +10,9 @@ services:
     environment:
       TZ: ${TZ:-Asia/Bangkok}
       SITE_URL: ${SITE_URL:-https://pickora.hotelcarepro.com}
+      SHOPEE_AFFILIATE_ID: ${SHOPEE_AFFILIATE_ID:-}
+      SHOPEE_SUB_ID_PREFIX: ${SHOPEE_SUB_ID_PREFIX:-pickora}
+      PIPELINE_ENV: ${PIPELINE_ENV:-production}
     volumes:
       - ./data:/app/data
       - ./public:/app/public
@@ -25,6 +28,9 @@ services:
     environment:
       TZ: ${TZ:-Asia/Bangkok}
       SITE_URL: ${SITE_URL:-https://pickora.hotelcarepro.com}
+      SHOPEE_AFFILIATE_ID: ${SHOPEE_AFFILIATE_ID:-}
+      SHOPEE_SUB_ID_PREFIX: ${SHOPEE_SUB_ID_PREFIX:-pickora}
+      PIPELINE_ENV: ${PIPELINE_ENV:-production}
     volumes:
       - ./data:/app/data
       - ./public:/app/public

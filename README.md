@@ -20,6 +20,12 @@ nano .env
 ```
 
 Set the private Shopee Data Feed URL in `.env`.
+Set `SHOPEE_AFFILIATE_ID` to the Affiliate ID shown in your own Shopee
+Affiliate account/campaign tools. **Never use an example Affiliate ID from
+Shopee documentation:** examples belong to neither Pickora nor your account and
+will not attribute commissions correctly. `SHOPEE_SUB_ID_PREFIX` defaults to
+`pickora`; the pipeline combines its ASCII-safe form with the stable feed
+`itemid`, for example `pickora-product-18895969590`.
 Set `GA4_MEASUREMENT_ID` to the ID from your GA4 web data stream (format `G-...`).
 
 ```bash
@@ -51,6 +57,39 @@ curl http://SERVER_IP:8080/sitemap.xml | head
 curl http://SERVER_IP:8080/data/seo-status.json
 curl http://SERVER_IP:8080/data/link-health.json
 ```
+
+### Verify Shopee affiliate tracking
+
+Each refresh keeps the canonical product page in `productUrl`, generates
+`affiliateUrl`, and sets the backwards-compatible `link` field to the same
+affiliate URL. Production mode stops before publishing when
+`SHOPEE_AFFILIATE_ID` is blank. A local test may explicitly set
+`PIPELINE_ENV=development`; this logs a warning and uses the canonical URL
+without claiming that tracking is active.
+
+Regenerate and inspect one URL without displaying the configured value itself:
+
+```bash
+docker compose build scheduler
+docker compose run --rm worker
+python3 - <<'PY'
+import json
+from urllib.parse import parse_qs, urlparse
+
+product = json.load(open("public/products.json", encoding="utf-8"))[0]
+parsed = urlparse(product["affiliateUrl"])
+params = parse_qs(parsed.query)
+print(parsed.netloc, parsed.path)
+print("tracked:", all(params.get(key) for key in
+      ("origin_link", "affiliate_id", "sub_id")))
+print("sub_id:", params.get("sub_id", [""])[0])
+PY
+```
+
+The expected host/path is `s.shopee.co.th /an_redir` and `tracked` should be
+`True`. After clicking a product's Shopee button, use the Shopee Affiliate
+report's Sub ID breakdown to find the corresponding
+`<prefix>-product-<itemid>` value. Reporting can be delayed by Shopee.
 
 Open:
 

@@ -27,8 +27,11 @@
       window.gtag("event", "affiliate_click", {
         link_url: link.href,
         link_domain: new URL(link.href).hostname,
-        product_id: link.dataset.productId || "",
-        product_name: link.dataset.productName || "",
+        destination_domain: new URL(link.href).hostname,
+        item_id: link.dataset.productId || "",
+        item_name: link.dataset.productName || "",
+        shop_id: link.dataset.shopId || "",
+        placement: link.dataset.placement || "",
         outbound: true,
         transport_type: "beacon"
       });
