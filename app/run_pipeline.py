@@ -6,6 +6,7 @@ import html
 import json
 import logging
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -270,6 +271,39 @@ def safe_external_url(value: object) -> str:
     return url if parsed.scheme in {"http", "https"} and parsed.netloc else ""
 
 
+def product_images(value: object, *, limit: int = 8) -> list[str]:
+    """Return the unique, valid image URLs supplied by an affiliate feed.
+
+    Feeds use either a JSON array or a separator-delimited string for galleries.
+    A plain URL remains fully backwards compatible with the original single-image
+    feed format.
+    """
+    candidates: list[object]
+    if isinstance(value, (list, tuple)):
+        candidates = list(value)
+    elif not isinstance(value, str):
+        candidates = []
+    else:
+        raw = value.strip()
+        if raw.startswith("["):
+            try:
+                decoded = json.loads(raw)
+                candidates = decoded if isinstance(decoded, list) else [raw]
+            except json.JSONDecodeError:
+                candidates = re.split(r"[|;\n]+", raw)
+        else:
+            candidates = re.split(r"[|;\n]+", raw)
+
+    images: list[str] = []
+    for candidate in candidates:
+        image = safe_external_url(candidate)
+        if image and image not in images:
+            images.append(image)
+        if len(images) == limit:
+            break
+    return images
+
+
 def update_price_history(products: list[dict[str, object]]) -> None:
     try:
         history = json.loads(PRICE_HISTORY_FILE.read_text(encoding="utf-8"))
@@ -334,7 +368,8 @@ def create_product_page(
         f"ดูราคา คะแนน ยอดขาย และรายละเอียด {title[:100]} "
         "พร้อมลิงก์ตรวจสอบราคาล่าสุดบน Shopee"
     )
-    image = safe_external_url(product.get("image", ""))
+    images = product_images(product.get("images") or product.get("image", ""))
+    image = images[0] if images else ""
     affiliate_link = safe_external_url(product.get("link", ""))
     category = str(product.get("category") or "สินค้าแนะนำ")
     shop = str(product.get("shop") or "")
@@ -350,7 +385,7 @@ def create_product_page(
         meta.append(f"ขายแล้ว {sold:,}")
     schema = {
         "@type": "Product", "name": title, "sku": str(product["id"]),
-        "image": [image], "category": category, "url": canonical,
+        "image": images, "category": category, "url": canonical,
         "description": description,
     }
     if price > 0:
@@ -384,6 +419,13 @@ def create_product_page(
         "url": str(product["detailUrl"]), "image": image,
         "price": price, "score": pickora_score, "category": category,
     }, ensure_ascii=False).replace("</", "<\\/")
+    thumbnails = "".join(
+        f'<button class="product-thumbnail{" active" if index == 0 else ""}" type="button" data-gallery-image="{html.escape(item, quote=True)}" aria-label="ดูรูปที่ {index + 1}" aria-pressed="{"true" if index == 0 else "false"}"><img src="{html.escape(item, quote=True)}" alt="" loading="lazy" width="112" height="112"></button>'
+        for index, item in enumerate(images)
+    )
+    gallery = f'''<div class="product-gallery">
+<img class="product-detail-image" data-gallery-main src="{html.escape(image, quote=True)}" alt="{html.escape(title, quote=True)}" decoding="async" fetchpriority="high" width="800" height="800">
+{f'<div class="product-thumbnails" aria-label="รูปสินค้า {len(images)} รูป">{thumbnails}</div>' if len(images) > 1 else ''}</div>'''
     return f"""<!doctype html>
 <html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{html.escape(title[:55])} | Pickora</title>
@@ -399,7 +441,7 @@ def create_product_page(
 <header class="header"><div class="container nav"><a class="brand" href="/"><span class="logo">P</span><span>Pickora</span></a><nav><a href="/affiliate-disclosure/">Affiliate Disclosure</a></nav></div></header>
 <main class="content-main"><article class="container product-detail">
 <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">หน้าแรก</a> / <a href="{html.escape(str(product['categoryUrl']), quote=True)}">{html.escape(category)}</a> / <span aria-current="page">{html.escape(title)}</span></nav>
-<div class="product-detail-grid"><img class="product-detail-image" src="{html.escape(image, quote=True)}" alt="{html.escape(title, quote=True)}" decoding="async" fetchpriority="high" width="800" height="800">
+<div class="product-detail-grid">{gallery}
 <div><span class="pill">{html.escape(category)}</span><h1>{html.escape(title)}</h1>
 <p class="product-shop">{html.escape(shop)}</p><p>{html.escape(" · ".join(meta))}</p>
 <div class="product-score"><strong>{pickora_score}</strong><span>Pickora Score<small>คำนวณจากคะแนน ยอดขาย ส่วนลด และข้อมูล Affiliate</small></span></div>
@@ -420,6 +462,7 @@ def create_product_page(
 </article></main>
 <footer><div class="container"><a href="/">หน้าแรก</a> · <a href="/guides/">คู่มือ</a> · <a href="/about/">เกี่ยวกับเรา</a> · <a href="/methodology/">วิธีคัดเลือกสินค้า</a> · <a href="/privacy/">ความเป็นส่วนตัว</a> · <a href="/affiliate-disclosure/">Affiliate Disclosure</a></div></footer>
 <script type="application/json" id="product-context">{product_context}</script>
+<script src="/product-gallery.js"></script>
 </body></html>"""
 
 
@@ -571,8 +614,9 @@ def process_feed() -> None:
             "product_name", "item_name", "title", "product_title", "productname"
         ])
         image_col = find_column(columns, [
+            "image_urls", "images", "product_images", "item_images",
             "image_url", "image_link", "product_image", "image", "item_image",
-            "imageurl"
+            "imageurl",
         ])
         link_col = find_column(columns, [
             "affiliate_link", "product_link", "offer_link", "item_url",
@@ -705,12 +749,15 @@ def process_feed() -> None:
     records = [
         product for product in all_records
         if safe_external_url(product.get("link", ""))
-        and safe_external_url(product.get("image", ""))
+        and product_images(product.get("image", ""))
     ]
     invalid_urls = len(all_records) - len(records)
     record_count = len(records)
     for rank, product in enumerate(records):
         normalise_product_text(product)
+        images = product_images(product.get("image", ""))
+        product["image"] = images[0]
+        product["images"] = images
         external_id = str(product.get("externalId") or "").strip()
         identity = (
             f"feed:{external_id}"

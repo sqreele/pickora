@@ -12,10 +12,37 @@ sys.path.insert(0, str(APP_DIR))
 
 import run_pipeline  # noqa: E402
 from run_pipeline import (  # noqa: E402
+    create_product_page,
     display_category,
     normalise_product_text,
+    product_images,
     repair_mojibake,
 )
+
+
+class ProductImagesTest(unittest.TestCase):
+    def test_accepts_json_and_delimited_galleries(self):
+        first = "https://cdn.example.com/one.jpg"
+        second = "https://cdn.example.com/two.jpg"
+        self.assertEqual(product_images(f'["{first}", "{second}"]'), [first, second])
+        self.assertEqual(product_images(f"{first}|{second}"), [first, second])
+
+    def test_drops_invalid_and_duplicate_urls(self):
+        image = "https://cdn.example.com/product.jpg"
+        self.assertEqual(product_images(f"{image};javascript:alert(1);{image}"), [image])
+
+    def test_generated_product_page_renders_gallery_for_multiple_images(self):
+        product = {
+            "id": "0123456789abcdef", "title": "สินค้าทดสอบ",
+            "image": "https://cdn.example.com/one.jpg",
+            "images": ["https://cdn.example.com/one.jpg", "https://cdn.example.com/two.jpg"],
+            "link": "https://shopee.example.com/item", "detailUrl": "/products/0123456789abcdef/",
+            "category": "ของใช้", "categoryUrl": "/categories/test/", "priceHistory": [],
+        }
+        page = create_product_page(product, [])
+        self.assertIn('class="product-thumbnails"', page)
+        self.assertEqual(page.count("data-gallery-image="), 2)
+        self.assertIn('<script src="/product-gallery.js"></script>', page)
 
 
 class RepairMojibakeTest(unittest.TestCase):
