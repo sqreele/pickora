@@ -3,8 +3,10 @@ from __future__ import annotations
 import sys
 import tempfile
 import unittest
+import json
 from pathlib import Path
 from unittest.mock import patch
+from urllib.parse import parse_qs, urlparse
 
 
 APP_DIR = Path(__file__).resolve().parents[1]
@@ -12,12 +14,72 @@ sys.path.insert(0, str(APP_DIR))
 
 import run_pipeline  # noqa: E402
 from run_pipeline import (  # noqa: E402
+    build_product_sub_id,
+    build_shopee_affiliate_link,
     create_product_page,
     display_category,
     normalise_product_text,
     product_images,
     repair_mojibake,
 )
+
+
+class ShopeeAffiliateLinkTest(unittest.TestCase):
+    product_url = "https://shopee.co.th/product/10308716/18895969590"
+
+    def test_builds_required_endpoint_and_parameters(self):
+        link = build_shopee_affiliate_link(
+            self.product_url, "affiliate-test", "pickora-product-18895969590"
+        )
+        parsed = urlparse(link)
+        params = parse_qs(parsed.query)
+        self.assertEqual((parsed.scheme, parsed.netloc, parsed.path), (
+            "https", "s.shopee.co.th", "/an_redir",
+        ))
+        self.assertEqual(params["origin_link"], [self.product_url])
+        self.assertEqual(params["affiliate_id"], ["affiliate-test"])
+        self.assertEqual(params["sub_id"], ["pickora-product-18895969590"])
+
+    def test_preserves_product_query_without_double_encoding(self):
+        product_url = f"{self.product_url}?utm_source=feed&variation=42"
+        link = build_shopee_affiliate_link(product_url, "123", "pickora-product-1")
+        self.assertEqual(parse_qs(urlparse(link).query)["origin_link"], [product_url])
+        self.assertNotIn("%252F", link)
+
+    def test_empty_and_unapproved_urls_are_rejected(self):
+        self.assertEqual(build_shopee_affiliate_link("  ", "123", "sub"), "")
+        for url in (
+            "http://shopee.co.th/product/1/2",
+            "https://example.com/product/1/2",
+            "https://shope.ee/an_redir?origin_link=x",
+        ):
+            with self.subTest(url=url):
+                self.assertEqual(build_shopee_affiliate_link(url, "123", "sub"), "")
+
+    def test_missing_affiliate_id_raises(self):
+        with self.assertRaisesRegex(ValueError, "SHOPEE_AFFILIATE_ID"):
+            build_shopee_affiliate_link(self.product_url, "", "sub")
+
+    def test_existing_redirect_is_unwrapped_not_double_wrapped(self):
+        first = build_shopee_affiliate_link(self.product_url, "old", "old-sub")
+        rebuilt = build_shopee_affiliate_link(first, "new", "new-sub")
+        params = parse_qs(urlparse(rebuilt).query)
+        self.assertEqual(params["origin_link"], [self.product_url])
+        self.assertNotIn("s.shopee.co.th/an_redir", params["origin_link"][0])
+        self.assertEqual(params["affiliate_id"], ["new"])
+
+    def test_sub_id_is_stable_and_ascii_safe(self):
+        first = build_product_sub_id("Pickora Thailand", "18895969590", "fallback")
+        second = build_product_sub_id("Pickora Thailand", "18895969590", "fallback")
+        self.assertEqual(first, second)
+        self.assertEqual(first, "Pickora-Thailand-product-18895969590")
+        self.assertRegex(first, r"^[A-Za-z0-9_-]+$")
+
+    def test_sub_id_uses_stable_fallback(self):
+        self.assertEqual(
+            build_product_sub_id("pickora", "", "abc123"),
+            "pickora-product-abc123",
+        )
 
 
 class ProductImagesTest(unittest.TestCase):
@@ -117,6 +179,49 @@ class GeneratedPagePermissionsTest(unittest.TestCase):
 
             self.assertEqual(products_dir.stat().st_mode & 0o777, 0o755)
             self.assertEqual(categories_dir.stat().st_mode & 0o777, 0o755)
+
+
+class ProductGenerationTest(unittest.TestCase):
+    def test_generation_keeps_canonical_and_marks_commission_unknown(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            data_dir = root / "data"
+            public_dir = root / "public"
+            data_dir.mkdir()
+            public_dir.mkdir()
+            feed = data_dir / "shopee_feed.csv"
+            feed.write_text(
+                "title,image,product_link,itemid,shopid,price,rating,sold\n"
+                "Test product,https://cdn.example.com/a.jpg,"
+                "https://shopee.co.th/product/10/20,20,10,100,5,25\n",
+                encoding="utf-8",
+            )
+            paths = {
+                "DATA_DIR": data_dir, "PUBLIC_DIR": public_dir,
+                "FEED_FILE": feed, "PRODUCTS_FILE": public_dir / "products.json",
+                "STATUS_FILE": public_dir / "feed-status.json",
+                "PRICE_HISTORY_FILE": public_dir / "price-history.json",
+                "SEO_STATUS_FILE": public_dir / "seo-status.json",
+                "SITEMAP_FILE": public_dir / "sitemap.xml",
+                "PRODUCT_PAGES_DIR": public_dir / "products",
+                "CATEGORY_PAGES_DIR": public_dir / "categories",
+            }
+            with patch.multiple(run_pipeline, **paths), patch.dict(
+                "os.environ",
+                {"SHOPEE_AFFILIATE_ID": "test-affiliate", "PIPELINE_ENV": "test"},
+            ):
+                run_pipeline.process_feed()
+
+            product = json.loads(paths["PRODUCTS_FILE"].read_text(encoding="utf-8"))[0]
+            self.assertEqual(product["productUrl"], "https://shopee.co.th/product/10/20")
+            self.assertEqual(product["link"], product["affiliateUrl"])
+            self.assertIsNone(product["commission"])
+            self.assertEqual(product["commissionStatus"], "unknown")
+            self.assertEqual(product["externalId"], "20")
+            self.assertEqual(product["shopId"], "10")
+            self.assertIn('rel="nofollow sponsored noopener noreferrer"', (
+                paths["PRODUCT_PAGES_DIR"] / product["id"] / "index.html"
+            ).read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":
