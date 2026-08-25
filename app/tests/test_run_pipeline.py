@@ -17,6 +17,7 @@ from run_pipeline import (  # noqa: E402
     build_product_sub_id,
     build_shopee_affiliate_link,
     create_product_page,
+    create_homepage,
     display_category,
     normalise_product_text,
     product_images,
@@ -189,6 +190,8 @@ class GeneratedPagePermissionsTest(unittest.TestCase):
                 PRODUCT_PAGES_DIR=products_dir,
                 CATEGORY_PAGES_DIR=categories_dir,
                 SITEMAP_FILE=public_dir / "sitemap.xml",
+                HOMEPAGE_FILE=public_dir / "index.html",
+                HOMEPAGE_TEMPLATE_FILE=APP_DIR.parent / "frontend" / "index.html",
             ):
                 run_pipeline.write_product_pages_and_sitemap([])
 
@@ -197,6 +200,23 @@ class GeneratedPagePermissionsTest(unittest.TestCase):
 
 
 class ProductGenerationTest(unittest.TestCase):
+    def test_homepage_contains_crawlable_initial_products(self):
+        template = (APP_DIR.parent / "frontend" / "index.html").read_text(encoding="utf-8")
+        product = {
+            "id": "0123456789abcdef", "title": "สินค้าทดสอบ SEO",
+            "image": "https://cdn.example.com/item.jpg", "price": 199,
+            "sold": 25, "pickoraScore": 80, "detailUrl": "/products/0123456789abcdef/",
+            "category": "ของใช้", "categoryUrl": "/categories/0123456789ab/",
+        }
+
+        page = create_homepage([product], template)
+
+        self.assertNotIn('<div id="grid" class="grid"></div>', page)
+        self.assertIn("สินค้าทดสอบ SEO", page)
+        self.assertIn('href="/products/0123456789abcdef/"', page)
+        self.assertIn('href="/categories/0123456789ab/"', page)
+        self.assertIn('<article class="card related-card">', page)
+
     def test_generation_keeps_canonical_and_marks_commission_unknown(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -224,6 +244,8 @@ class ProductGenerationTest(unittest.TestCase):
                 "SITEMAP_FILE": public_dir / "sitemap.xml",
                 "PRODUCT_PAGES_DIR": public_dir / "products",
                 "CATEGORY_PAGES_DIR": public_dir / "categories",
+                "HOMEPAGE_FILE": public_dir / "index.html",
+                "HOMEPAGE_TEMPLATE_FILE": APP_DIR.parent / "frontend" / "index.html",
             }
             with patch.multiple(run_pipeline, **paths), patch.dict(
                 "os.environ",

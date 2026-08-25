@@ -36,6 +36,8 @@ SEO_STATUS_FILE = PUBLIC_DIR / "seo-status.json"
 SITEMAP_FILE = PUBLIC_DIR / "sitemap.xml"
 PRODUCT_PAGES_DIR = PUBLIC_DIR / "products"
 CATEGORY_PAGES_DIR = PUBLIC_DIR / "categories"
+HOMEPAGE_FILE = PUBLIC_DIR / "index.html"
+HOMEPAGE_TEMPLATE_FILE = Path(os.getenv("HOMEPAGE_TEMPLATE_FILE", "/app/frontend/index.html"))
 
 FEED_URL = os.getenv("SHOPEE_FEED_URL", "").strip()
 SITE_URL = os.getenv("SITE_URL", "https://pickora.hotelcarepro.com").strip().rstrip("/")
@@ -391,12 +393,47 @@ def product_card(product: dict[str, object]) -> str:
     return f"""<article class="card related-card">
 <a class="card-image-link" href="{html.escape(str(product['detailUrl']), quote=True)}">
 <img src="{html.escape(safe_external_url(product.get('image', '')), quote=True)}" alt="{html.escape(title, quote=True)}" loading="lazy" decoding="async" width="600" height="600"></a>
-<div class="card-body"><div class="category">{html.escape(str(product.get('category') or 'สินค้าแนะนำ'))}</div>
+<div class="card-body"><a class="category" href="{html.escape(str(product.get('categoryUrl') or '/#products'), quote=True)}">{html.escape(str(product.get('category') or 'สินค้าแนะนำ'))}</a>
 <h3 class="title"><a href="{html.escape(str(product['detailUrl']), quote=True)}">{html.escape(title)}</a></h3>
 <div class="score-badge" title="คำนวณจากคะแนน ยอดขาย ส่วนลด และข้อมูล Affiliate">Pickora Score {pickora_score}</div>
 <div class="price">{html.escape(price_text)}</div>
 {f'<small class="price-note">โปรโมชันจริงอาจต่ำกว่านี้</small>' if price > 0 else ''}
 <a class="primary buy" href="{html.escape(str(product['detailUrl']), quote=True)}">ดูรายละเอียด →</a></div></article>"""
+
+
+def create_homepage(products: list[dict[str, object]], template: str) -> str:
+    """Render the persisted feed's first useful product set into the home page."""
+    recommended = products[:24]
+    popular = sorted(
+        products, key=lambda item: float(item.get("sold") or 0), reverse=True
+    )[:4]
+    recommended_html = "".join(product_card(product) for product in recommended)
+    popular_html = "".join(product_card(product) for product in popular)
+    replacements = {
+        '<p id="feedStatus">กำลังโหลดข้อมูลสินค้า...</p>': (
+            f'<p id="feedStatus">แสดงสินค้าแนะนำ {len(recommended):,} รายการ'
+            " · กำลังตรวจสอบเวลาอัปเดตล่าสุด...</p>"
+        ),
+        '<div id="grid" class="grid"></div>': (
+            f'<div id="grid" class="grid">{recommended_html}</div>'
+        ),
+        '<div id="popularGrid" class="grid compact-grid"></div>': (
+            f'<div id="popularGrid" class="grid compact-grid">{popular_html}</div>'
+        ),
+    }
+    rendered = template
+    for marker, replacement in replacements.items():
+        if marker not in rendered:
+            raise ValueError(f"homepage template marker missing: {marker}")
+        rendered = rendered.replace(marker, replacement, 1)
+    return rendered
+
+
+def write_homepage(products: list[dict[str, object]]) -> None:
+    template = HOMEPAGE_TEMPLATE_FILE.read_text(encoding="utf-8")
+    temporary = HOMEPAGE_FILE.with_suffix(".tmp")
+    temporary.write_text(create_homepage(products, template), encoding="utf-8")
+    temporary.replace(HOMEPAGE_FILE)
 
 
 def breadcrumb_schema(items: list[tuple[str, str]]) -> dict[str, object]:
@@ -580,6 +617,7 @@ def create_category_page(
 
 def write_product_pages_and_sitemap(products: list[dict[str, object]]) -> None:
     PUBLIC_DIR.mkdir(parents=True, exist_ok=True)
+    write_homepage(products)
     temporary_pages = Path(tempfile.mkdtemp(prefix="products-", dir=PUBLIC_DIR))
     temporary_categories = Path(tempfile.mkdtemp(prefix="categories-", dir=PUBLIC_DIR))
     # mkdtemp intentionally creates directories with mode 0700. These directories
