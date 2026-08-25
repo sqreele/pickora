@@ -2,12 +2,40 @@ from __future__ import annotations
 
 import unittest
 from pathlib import Path
+from xml.etree import ElementTree
 
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
 class ProductionRouteTest(unittest.TestCase):
+    def test_homepage_has_complete_static_seo_baseline(self):
+        source = (ROOT / "frontend/index.html").read_text(encoding="utf-8")
+        for marker in (
+            "<title>", 'name="description"', 'rel="canonical"',
+            'name="robots"', "<h1>", 'href="/reviews/',
+            'type="application/ld+json"',
+        ):
+            with self.subTest(marker=marker):
+                self.assertIn(marker, source)
+
+    def test_robots_and_source_sitemap_are_valid(self):
+        robots = (ROOT / "frontend/robots.txt").read_text(encoding="utf-8")
+        self.assertIn("User-agent: *", robots)
+        self.assertIn("Allow: /", robots)
+        self.assertIn(
+            "Sitemap: https://pickora.hotelcarepro.com/sitemap.xml", robots
+        )
+        sitemap = ElementTree.parse(ROOT / "frontend/sitemap.xml").getroot()
+        locations = [
+            item.text for item in sitemap.findall(
+                ".//{http://www.sitemaps.org/schemas/sitemap/0.9}loc"
+            )
+        ]
+        self.assertIn("https://pickora.hotelcarepro.com/", locations)
+        self.assertTrue(all(url.startswith("https://pickora.hotelcarepro.com/") for url in locations))
+        self.assertFalse(any("?" in url for url in locations))
+
     def test_analytics_routes_do_not_use_spa_fallback(self):
         nginx = (ROOT / "nginx/default.conf").read_text(encoding="utf-8")
         self.assertIn("location = /analytics {", nginx)
@@ -84,6 +112,8 @@ class ProductionRouteTest(unittest.TestCase):
         self.assertIn(
             "try_files /data/categories/$1/index.html =404;", nginx
         )
+        self.assertIn("try_files /data/index.html /index.html =404;", nginx)
+        self.assertGreaterEqual(compose.count("./frontend:/app/frontend:ro"), 2)
     def test_dashboard_hidden_states_cannot_be_overridden(self):
         css = (
             ROOT / "frontend/analytics/dashboard-state.css"
