@@ -1,8 +1,14 @@
 from __future__ import annotations
 
+import sys
 import unittest
+from pathlib import Path
 
-from analytics_api import GA4Client, create_app
+
+APP_DIR = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(APP_DIR))
+
+from analytics_api import GA4Client, create_app  # noqa: E402
 
 
 SAMPLE_REPORT = {
