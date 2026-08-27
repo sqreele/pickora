@@ -8,6 +8,7 @@ import os
 import re
 import time
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 from urllib.parse import parse_qs, urlparse
 
@@ -48,7 +49,12 @@ class FakeFeedResponse:
 
 
 class FeedDownloadLifecycleTest(unittest.TestCase):
-    def run_download(self, data_dir: Path, response: FakeFeedResponse):
+    def run_download(
+        self,
+        data_dir: Path,
+        response: FakeFeedResponse,
+        free_bytes: int = 16 * 1024**3,
+    ):
         canonical_feed = data_dir / "shopee_feed.csv"
         public_dir = data_dir.parent / "public"
         public_dir.mkdir()
@@ -60,7 +66,12 @@ class FeedDownloadLifecycleTest(unittest.TestCase):
             STATUS_FILE=public_dir / "feed-status.json",
             FEED_URL="https://feed.example.test/download",
         ), patch.object(run_pipeline.requests, "get", return_value=response):
-            run_pipeline.download_feed()
+            with patch.object(
+                run_pipeline.shutil,
+                "disk_usage",
+                return_value=SimpleNamespace(free=free_bytes),
+            ):
+                run_pipeline.download_feed()
         return canonical_feed
 
     def test_success_replaces_canonical_feed_and_removes_temp(self):
@@ -138,6 +149,101 @@ class FeedDownloadLifecycleTest(unittest.TestCase):
                 with self.assertRaisesRegex(ConnectionError, "original download error"):
                     self.run_download(data_dir, FakeFeedResponse(failing_blocks()))
 
+            self.assertEqual(canonical_feed.read_bytes(), b"previous canonical feed")
+
+
+class FeedDownloadDiskGuardrailTest(unittest.TestCase):
+    def test_no_canonical_feed_requires_eight_gib(self):
+        self.assertEqual(
+            run_pipeline.required_feed_download_free_bytes(0),
+            run_pipeline.MIN_FEED_DOWNLOAD_FREE_BYTES,
+        )
+
+    def test_small_canonical_feed_still_requires_eight_gib(self):
+        self.assertEqual(
+            run_pipeline.required_feed_download_free_bytes(1024**3),
+            run_pipeline.MIN_FEED_DOWNLOAD_FREE_BYTES,
+        )
+
+    def test_large_canonical_feed_requires_twice_its_size(self):
+        feed_size = 5 * 1024**3
+        self.assertEqual(
+            run_pipeline.required_feed_download_free_bytes(feed_size),
+            feed_size * 2,
+        )
+
+    def test_free_disk_exactly_at_threshold_allows_download(self):
+        with tempfile.TemporaryDirectory() as directory:
+            data_dir = Path(directory) / "data"
+            data_dir.mkdir()
+            downloaded_feed = b"title,price\n" + (b"product,100\n" * 20)
+            lifecycle = FeedDownloadLifecycleTest()
+
+            canonical_feed = lifecycle.run_download(
+                data_dir,
+                FakeFeedResponse([downloaded_feed]),
+                free_bytes=run_pipeline.MIN_FEED_DOWNLOAD_FREE_BYTES,
+            )
+
+            self.assertEqual(canonical_feed.read_bytes(), downloaded_feed)
+
+    def test_one_byte_below_threshold_rejects_before_network_or_temp(self):
+        with tempfile.TemporaryDirectory() as directory:
+            data_dir = Path(directory) / "data"
+            public_dir = Path(directory) / "public"
+            data_dir.mkdir()
+            canonical_feed = data_dir / "shopee_feed.csv"
+            canonical_feed.write_bytes(b"previous canonical feed")
+
+            with patch.multiple(
+                run_pipeline,
+                DATA_DIR=data_dir,
+                FEED_FILE=canonical_feed,
+                PUBLIC_DIR=public_dir,
+                STATUS_FILE=public_dir / "feed-status.json",
+                FEED_URL="https://feed.example.test/download",
+            ), patch.object(
+                run_pipeline.shutil,
+                "disk_usage",
+                return_value=SimpleNamespace(
+                    free=run_pipeline.MIN_FEED_DOWNLOAD_FREE_BYTES - 1
+                ),
+            ), patch.object(run_pipeline.requests, "get") as request_get, patch.object(
+                run_pipeline.tempfile, "NamedTemporaryFile"
+            ) as named_temporary_file:
+                with self.assertRaisesRegex(RuntimeError, "Insufficient disk space"):
+                    run_pipeline.download_feed()
+
+            request_get.assert_not_called()
+            named_temporary_file.assert_not_called()
+            self.assertEqual(canonical_feed.read_bytes(), b"previous canonical feed")
+            self.assertEqual(list(data_dir.glob("shopee_feed_*.download")), [])
+            self.assertFalse(public_dir.exists())
+
+    def test_disk_usage_failure_preserves_canonical_and_skips_network(self):
+        with tempfile.TemporaryDirectory() as directory:
+            data_dir = Path(directory) / "data"
+            data_dir.mkdir()
+            canonical_feed = data_dir / "shopee_feed.csv"
+            canonical_feed.write_bytes(b"previous canonical feed")
+
+            with patch.multiple(
+                run_pipeline,
+                DATA_DIR=data_dir,
+                FEED_FILE=canonical_feed,
+                FEED_URL="https://feed.example.test/download",
+            ), patch.object(
+                run_pipeline.shutil,
+                "disk_usage",
+                side_effect=OSError("disk usage unavailable"),
+            ), patch.object(run_pipeline.requests, "get") as request_get, patch.object(
+                run_pipeline.tempfile, "NamedTemporaryFile"
+            ) as named_temporary_file:
+                with self.assertRaisesRegex(OSError, "disk usage unavailable"):
+                    run_pipeline.download_feed()
+
+            request_get.assert_not_called()
+            named_temporary_file.assert_not_called()
             self.assertEqual(canonical_feed.read_bytes(), b"previous canonical feed")
 
 

@@ -34,6 +34,7 @@ FEED_FILE = DATA_DIR / "shopee_feed.csv"
 FEED_TEMP_PREFIX = "shopee_feed_"
 FEED_TEMP_SUFFIX = ".download"
 STALE_FEED_TEMP_AGE_SECONDS = 6 * 60 * 60
+MIN_FEED_DOWNLOAD_FREE_BYTES = 8 * 1024**3
 PRODUCTS_FILE = PUBLIC_DIR / "products.json"
 STATUS_FILE = PUBLIC_DIR / "feed-status.json"
 PRICE_HISTORY_FILE = PUBLIC_DIR / "price-history.json"
@@ -368,12 +369,48 @@ def validate_feed_download(temporary_path: Path) -> None:
         raise RuntimeError("Downloaded feed is unexpectedly small")
 
 
+def required_feed_download_free_bytes(feed_size: int) -> int:
+    """Return space needed for a full replacement download plus headroom."""
+    return max(MIN_FEED_DOWNLOAD_FREE_BYTES, feed_size * 2)
+
+
+def ensure_feed_download_disk_space() -> None:
+    """Reject a feed refresh before network I/O when free disk is unsafe."""
+    try:
+        feed_size = FEED_FILE.stat().st_size
+    except FileNotFoundError:
+        feed_size = 0
+
+    required_bytes = required_feed_download_free_bytes(feed_size)
+    try:
+        free_bytes = shutil.disk_usage(DATA_DIR).free
+    except OSError:
+        logging.exception(
+            "Failed to determine free disk space before feed download: data_dir=%s",
+            DATA_DIR,
+        )
+        raise
+
+    if free_bytes < required_bytes:
+        message = (
+            "Insufficient disk space for feed download: "
+            f"free={free_bytes} bytes ({free_bytes / 1024**3:.2f} GiB), "
+            f"required={required_bytes} bytes "
+            f"({required_bytes / 1024**3:.2f} GiB), "
+            f"current_feed={feed_size} bytes ({feed_size / 1024**3:.2f} GiB), "
+            f"data_dir={DATA_DIR}"
+        )
+        logging.error(message)
+        raise RuntimeError(message)
+
+
 def download_feed() -> None:
     if not FEED_URL:
         raise RuntimeError("SHOPEE_FEED_URL is missing in .env")
 
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     cleanup_stale_feed_downloads()
+    ensure_feed_download_disk_space()
     write_status("downloading")
 
     logging.info("Downloading Shopee data feed")
