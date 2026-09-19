@@ -88,18 +88,18 @@ CATEGORY_AUDIENCE = {
 CATEGORY_TOPICAL_CONTENT = {
     "Beauty": {
         "intro": (
-            "หมวด Beauty รวมผลิตภัณฑ์ดูแลผิวและความงามจากรายการสินค้าที่ Pickora คัดไว้. "
+            "หมวด Beauty รวมผลิตภัณฑ์ดูแลผิวและความงามจากรายการสินค้าที่ FindVexa คัดไว้. "
             "ก่อนเลือกซื้อ ควรเปรียบเทียบประเภทสินค้า ส่วนผสม และวิธีใช้ให้เหมาะกับการใช้งานของตน. "
-            "Pickora แสดงราคาอ้างอิง คะแนน ยอดขาย และรายละเอียดรายการเพื่อช่วยให้เปรียบเทียบก่อนเปิดหน้าร้าน."
+            "FindVexa แสดงราคาอ้างอิง คะแนน ยอดขาย และรายละเอียดรายการเพื่อช่วยให้เปรียบเทียบก่อนเปิดหน้าร้าน."
         ),
         "considerations": ["เลือกประเภทสินค้าและอ่านส่วนผสม", "ตรวจสอบความเข้ากันได้กับผิวและวิธีใช้", "ตรวจสอบผู้ขายและรายละเอียดสินค้าจากหน้าร้านก่อนสั่งซื้อ"],
-        "faq": [("เลือกผลิตภัณฑ์ Beauty ควรดูอะไรบ้าง?", "เริ่มจากประเภทสินค้า ส่วนผสม วิธีใช้ และรายละเอียดจากหน้าร้าน เพื่อเปรียบเทียบกับความต้องการของตน."), ("ข้อมูลราคาใน Pickora ใช้ตัดสินใจได้อย่างไร?", "ใช้เป็นราคาอ้างอิงเพื่อเปรียบเทียบรายการ แล้วตรวจสอบราคาและโปรโมชันล่าสุดบนหน้าร้านก่อนสั่งซื้อ.")],
+        "faq": [("เลือกผลิตภัณฑ์ Beauty ควรดูอะไรบ้าง?", "เริ่มจากประเภทสินค้า ส่วนผสม วิธีใช้ และรายละเอียดจากหน้าร้าน เพื่อเปรียบเทียบกับความต้องการของตน."), ("ข้อมูลราคาใน FindVexa ใช้ตัดสินใจได้อย่างไร?", "ใช้เป็นราคาอ้างอิงเพื่อเปรียบเทียบรายการ แล้วตรวจสอบราคาและโปรโมชันล่าสุดบนหน้าร้านก่อนสั่งซื้อ.")],
     },
     "Mobile & Gadgets": {
         "intro": (
             "หมวด Mobile & Gadgets รวมอุปกรณ์พกพาและอุปกรณ์เสริมสำหรับการใช้งานประจำวัน. "
             "ควรเปรียบเทียบความเข้ากันได้ การเชื่อมต่อ พอร์ต และความจุหรือกำลังไฟตามประเภทสินค้า. "
-            "Pickora ช่วยเรียงรายการตามข้อมูลที่มี เพื่อให้เปิดดูรายละเอียดและราคาอ้างอิงได้สะดวกขึ้น."
+            "FindVexa ช่วยเรียงรายการตามข้อมูลที่มี เพื่อให้เปิดดูรายละเอียดและราคาอ้างอิงได้สะดวกขึ้น."
         ),
         "considerations": ["ตรวจสอบความเข้ากันได้กับอุปกรณ์ที่ใช้งาน", "เปรียบเทียบพอร์ตและมาตรฐานการเชื่อมต่อ", "ตรวจสอบความจุหรือกำลังไฟตามประเภทสินค้า", "อ่านเงื่อนไขผู้ขายและรายละเอียดสินค้าก่อนสั่งซื้อ"],
         "faq": [("เลือกอุปกรณ์เสริมมือถือควรดูอะไรบ้าง?", "ตรวจสอบรุ่นอุปกรณ์ที่รองรับ พอร์ต และมาตรฐานการเชื่อมต่อก่อนเปรียบเทียบราคา."), ("เลือก Power Bank ควรตรวจสอบอะไร?", "ตรวจสอบความจุ มาตรฐานการชาร์จ พอร์ต และขนาดสำหรับการพกพาจากรายละเอียดหน้าร้าน.")],
@@ -108,7 +108,7 @@ CATEGORY_TOPICAL_CONTENT = {
         "intro": (
             "หมวด Home & Living รวมของใช้และอุปกรณ์สำหรับพื้นที่ภายในบ้าน. "
             "การเปรียบเทียบควรเริ่มจากขนาด วัสดุ พื้นที่ติดตั้ง และวิธีดูแลรักษาตามการใช้งานจริง. "
-            "Pickora รวบรวมข้อมูลรายการและราคาอ้างอิงเพื่อช่วยให้เลือกดูรายละเอียดที่เกี่ยวข้องได้ง่ายขึ้น."
+            "FindVexa รวบรวมข้อมูลรายการและราคาอ้างอิงเพื่อช่วยให้เลือกดูรายละเอียดที่เกี่ยวข้องได้ง่ายขึ้น."
         ),
         "considerations": ["วัดขนาดพื้นที่ก่อนเลือกสินค้า", "ตรวจสอบวัสดุและการดูแลรักษา", "พิจารณาการติดตั้งหรือการประกอบเมื่อเกี่ยวข้อง"],
         "faq": [("เลือกของใช้ในบ้านควรเริ่มจากอะไร?", "เริ่มจากขนาดพื้นที่และรูปแบบการใช้งาน แล้วเปรียบเทียบวัสดุและวิธีดูแลรักษา."), ("ควรตรวจสอบขนาดจากตรงไหน?", "ตรวจสอบขนาดสินค้าจากรายละเอียดหน้าร้านและเทียบกับพื้นที่ที่จะใช้งานก่อนสั่งซื้อ.")],
@@ -117,7 +117,7 @@ CATEGORY_TOPICAL_CONTENT = {
         "intro": (
             "หมวด Audio รวมอุปกรณ์เสียงสำหรับการฟัง การสื่อสาร และการใช้งานแบบพกพา. "
             "ควรเปรียบเทียบรูปแบบการเชื่อมต่อ เวลาใช้งานแบตเตอรี่ ไมโครโฟน และรูปทรงที่เหมาะกับการใช้งาน. "
-            "Pickora แสดงรายการที่มีข้อมูลราคาอ้างอิง คะแนน และยอดขายเพื่อช่วยให้เปรียบเทียบก่อนดูหน้าร้าน."
+            "FindVexa แสดงรายการที่มีข้อมูลราคาอ้างอิง คะแนน และยอดขายเพื่อช่วยให้เปรียบเทียบก่อนดูหน้าร้าน."
         ),
         "considerations": ["เลือกรูปแบบการเชื่อมต่อให้เหมาะกับอุปกรณ์", "พิจารณาเวลาใช้งานแบตเตอรี่เมื่อเป็นอุปกรณ์ไร้สาย", "ตรวจสอบความต้องการใช้ไมโครโฟนและรูปทรงสินค้า"],
         "faq": [("ควรเลือกหูฟังแบบ Bluetooth หรือมีสาย?", "เลือกตามอุปกรณ์ที่ใช้ ความสะดวกในการพกพา และรูปแบบการเชื่อมต่อที่ต้องการ."), ("เลือกอุปกรณ์เสียงควรดูไมโครโฟนหรือไม่?", "หากต้องใช้โทรหรือประชุม ควรอ่านรายละเอียดไมโครโฟนและการเชื่อมต่อจากหน้าร้าน.")],
@@ -126,16 +126,16 @@ CATEGORY_TOPICAL_CONTENT = {
         "intro": (
             "หมวด Health รวมสินค้าที่เกี่ยวกับการดูแลตนเองและการใช้งานตามรายละเอียดของผู้ขาย. "
             "ควรเปรียบเทียบวัตถุประสงค์การใช้ ขนาดหรือข้อมูลจำเพาะ และคำแนะนำบนฉลากหรือหน้าร้านอย่างรอบคอบ. "
-            "Pickora ช่วยให้ดูรายการและราคาอ้างอิงได้ แต่ไม่ทดแทนคำแนะนำทางการแพทย์หรือข้อมูลจากผู้ผลิต."
+            "FindVexa ช่วยให้ดูรายการและราคาอ้างอิงได้ แต่ไม่ทดแทนคำแนะนำทางการแพทย์หรือข้อมูลจากผู้ผลิต."
         ),
         "considerations": ["ตรวจสอบวัตถุประสงค์การใช้งานและรายละเอียดสินค้า", "พิจารณาขนาดหรือข้อมูลจำเพาะที่เกี่ยวข้อง", "อ่านคำแนะนำและข้อมูลการขึ้นทะเบียนจากผู้ผลิตหรือหน้าร้านเมื่อมี"],
-        "faq": [("เลือกสินค้าในหมวด Health ควรดูอะไร?", "อ่านวัตถุประสงค์การใช้ ข้อมูลจำเพาะ และคำแนะนำจากผู้ผลิตหรือหน้าร้านก่อนตัดสินใจ."), ("Pickora ให้คำแนะนำทางการแพทย์หรือไม่?", "ไม่ให้คำแนะนำทางการแพทย์; หน้านี้ใช้เพื่อเปรียบเทียบข้อมูลรายการและราคาอ้างอิง.")],
+        "faq": [("เลือกสินค้าในหมวด Health ควรดูอะไร?", "อ่านวัตถุประสงค์การใช้ ข้อมูลจำเพาะ และคำแนะนำจากผู้ผลิตหรือหน้าร้านก่อนตัดสินใจ."), ("FindVexa ให้คำแนะนำทางการแพทย์หรือไม่?", "ไม่ให้คำแนะนำทางการแพทย์; หน้านี้ใช้เพื่อเปรียบเทียบข้อมูลรายการและราคาอ้างอิง.")],
     },
     "Mom & Baby": {
         "intro": (
             "หมวด Mom & Baby รวมสินค้าสำหรับผู้ปกครองและเด็กตามรายละเอียดของแต่ละรายการ. "
             "ควรเปรียบเทียบช่วงวัย ขนาด วัสดุ คำแนะนำด้านความปลอดภัย และวิธีทำความสะอาดก่อนเลือกซื้อ. "
-            "Pickora ช่วยรวบรวมรายการและราคาอ้างอิงเพื่อให้ตรวจสอบรายละเอียดจากหน้าร้านได้สะดวกขึ้น."
+            "FindVexa ช่วยรวบรวมรายการและราคาอ้างอิงเพื่อให้ตรวจสอบรายละเอียดจากหน้าร้านได้สะดวกขึ้น."
         ),
         "considerations": ["ตรวจสอบช่วงวัยและขนาดที่เหมาะสม", "อ่านข้อมูลวัสดุและคำแนะนำด้านความปลอดภัย", "พิจารณาวิธีทำความสะอาดและดูแลรักษา"],
         "faq": [("เลือกสินค้าแม่และเด็กควรดูอะไรบ้าง?", "ตรวจสอบช่วงวัย ขนาด วัสดุ และคำแนะนำจากผู้ผลิตหรือหน้าร้านก่อนสั่งซื้อ."), ("ควรตรวจสอบวิธีดูแลรักษาหรือไม่?", "ควรอ่านวิธีทำความสะอาดและการดูแลรักษา เพื่อให้เหมาะกับการใช้งานของครอบครัว.")],
@@ -143,7 +143,7 @@ CATEGORY_TOPICAL_CONTENT = {
 }
 
 FEED_URL = os.getenv("SHOPEE_FEED_URL", "").strip()
-SITE_URL = os.getenv("SITE_URL", "https://pickora.hotelcarepro.com").strip().rstrip("/")
+SITE_URL = os.getenv("SITE_URL", "https://findvexa.com").strip().rstrip("/")
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "50000"))
 MAX_PRODUCTS = int(os.getenv("MAX_PRODUCTS", "600"))
 TOP_PER_CHUNK = int(os.getenv("TOP_PER_CHUNK", "300"))
@@ -421,7 +421,7 @@ def download_feed() -> None:
             stream=True,
             timeout=(30, 3600),
             allow_redirects=True,
-            headers={"User-Agent": "PickoraFeed/1.0"},
+            headers={"User-Agent": "FindVexaFeed/1.0"},
         ) as response:
             response.raise_for_status()
 
@@ -612,7 +612,7 @@ def product_card(product: dict[str, object]) -> str:
 <img src="{html.escape(safe_external_url(product.get('image', '')), quote=True)}" alt="{html.escape(title, quote=True)}" loading="lazy" decoding="async" width="600" height="600"></a>
 <div class="card-body"><div class="category">{html.escape(str(product.get('category') or 'สินค้าแนะนำ'))}</div>
 <h3 class="title"><a href="{html.escape(str(product['detailUrl']), quote=True)}">{html.escape(title)}</a></h3>
-<div class="score-badge" title="คำนวณจากคะแนน ยอดขาย ส่วนลด และข้อมูล Affiliate">Pickora Score {pickora_score}</div>
+<div class="score-badge" title="คำนวณจากคะแนน ยอดขาย ส่วนลด และข้อมูล Affiliate">FindVexa Score {pickora_score}</div>
 <div class="price">{html.escape(price_text)}</div>
 {f'<small class="price-note">โปรโมชันจริงอาจต่ำกว่านี้</small>' if price > 0 else ''}
 <a class="primary buy" href="{html.escape(str(product['detailUrl']), quote=True)}">ดูรายละเอียด →</a></div></article>"""
@@ -710,7 +710,7 @@ def select_homepage_products(products: list[dict[str, object]]) -> list[dict[str
 
 def category_intro(category: str) -> str:
     return (
-        f"รวมสินค้าน่าสนใจในหมวด {category} ที่ Pickora คัดจากข้อมูลราคา "
+        f"รวมสินค้าน่าสนใจในหมวด {category} ที่ FindVexa คัดจากข้อมูลราคา "
         "คะแนน ยอดขาย และสัญญาณจาก Affiliate feed เพื่อช่วยเปรียบเทียบก่อนดูรายละเอียดสินค้า"
     )
 
@@ -720,7 +720,7 @@ def category_landing_intro(category: str) -> str:
     if content:
         return str(content["intro"])
     return (
-        f"หน้านี้รวบรวมสินค้าในหมวด {category} จากรายการที่ Pickora คัดไว้. "
+        f"หน้านี้รวบรวมสินค้าในหมวด {category} จากรายการที่ FindVexa คัดไว้. "
         "เปรียบเทียบชื่อสินค้า ราคาอ้างอิง คะแนน และยอดขายที่แสดงในแต่ละรายการก่อนเปิดดูรายละเอียดจากหน้าร้าน."
     )
 
@@ -737,8 +737,8 @@ def category_faq(category: str) -> list[tuple[str, str]]:
 
 def category_metadata_title(category: str, page_number: int) -> str:
     if page_number > 1:
-        return f"{category} · หน้า {page_number} | Pickora"
-    return f"{category} สินค้าแนะนำและวิธีเลือก | Pickora"
+        return f"{category} · หน้า {page_number} | FindVexa"
+    return f"{category} สินค้าแนะนำและวิธีเลือก | FindVexa"
 
 
 def category_metadata_description(category: str, page_number: int) -> str:
@@ -749,7 +749,7 @@ def category_metadata_description(category: str, page_number: int) -> str:
         )
     return (
         f"เลือกดูสินค้า {category} พร้อมเปรียบเทียบราคาอ้างอิง คะแนน และยอดขาย "
-        "จากรายการที่ Pickora คัดไว้ก่อนดูรายละเอียดสินค้า"
+        "จากรายการที่ FindVexa คัดไว้ก่อนดูรายละเอียดสินค้า"
     )
 
 
@@ -767,10 +767,10 @@ def product_summary(product: dict[str, object], category: str, price_text: str) 
     """Return concise, feed-grounded copy for a generated product page."""
     facts = [f"{product['title']} อยู่ในหมวด {category}"]
     if float(product.get("price") or 0) > 0:
-        facts.append(f"ข้อมูลราคาอ้างอิงที่ Pickora แสดงคือ {price_text}")
+        facts.append(f"ข้อมูลราคาอ้างอิงที่ FindVexa แสดงคือ {price_text}")
     score = int(product.get("pickoraScore") or 0)
     if score > 0:
-        facts.append(f"Pickora Score {score}")
+        facts.append(f"FindVexa Score {score}")
     rating = float(product.get("rating") or 0)
     sold = int(float(product.get("sold") or 0))
     if rating > 0:
@@ -829,7 +829,7 @@ def product_meta_description(
         description += f" พร้อม{price_text}"
     score = int(product.get("pickoraScore") or 0)
     if score > 0:
-        description += f" และ Pickora Score {score}"
+        description += f" และ FindVexa Score {score}"
     description += " เพื่อช่วยเปรียบเทียบก่อนตัดสินใจซื้อ"
     if len(description) <= 155:
         return description
@@ -976,23 +976,23 @@ def create_product_page(
 {f'<div class="product-thumbnails" aria-label="รูปสินค้า {len(images)} รูป">{thumbnails}</div>' if len(images) > 1 else ''}</div>'''
     return f"""<!doctype html>
 <html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{html.escape(metadata_title)} | Pickora</title>
+<title>{html.escape(metadata_title)} ราคา รีวิว และข้อมูลก่อนซื้อ | FindVexa</title>
 <meta name="description" content="{html.escape(description[:155], quote=True)}">
 <link rel="canonical" href="{html.escape(canonical, quote=True)}">
-<meta property="og:type" content="product"><meta property="og:site_name" content="Pickora">
+<meta property="og:type" content="product"><meta property="og:site_name" content="FindVexa">
 <meta property="og:title" content="{html.escape(title, quote=True)}"><meta property="og:description" content="{html.escape(description[:155], quote=True)}">
 <meta property="og:url" content="{html.escape(canonical, quote=True)}"><meta property="og:image" content="{html.escape(image, quote=True)}">
-<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{html.escape(title, quote=True)}"><meta name="twitter:image" content="{html.escape(image, quote=True)}">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{html.escape(title, quote=True)}"><meta name="twitter:description" content="{html.escape(description[:155], quote=True)}"><meta name="twitter:image" content="{html.escape(image, quote=True)}">
 <link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/content.css"><link rel="stylesheet" href="/catalog.css"><link rel="stylesheet" href="/product.css">
 <script type="application/ld+json">{schema_json}</script></head><body>
-<div class="notice">หน้านี้มีลิงก์ Affiliate และ Pickora อาจได้รับค่าคอมมิชชัน โดยไม่มีค่าใช้จ่ายเพิ่มสำหรับผู้ซื้อ</div>
-<header class="header"><div class="container nav"><a class="brand" href="/"><span class="logo">P</span><span>Pickora</span></a><nav><a href="/affiliate-disclosure/">Affiliate Disclosure</a></nav></div></header>
+<div class="notice">หน้านี้มีลิงก์ Affiliate และ FindVexa อาจได้รับค่าคอมมิชชัน โดยไม่มีค่าใช้จ่ายเพิ่มสำหรับผู้ซื้อ</div>
+<header class="header"><div class="container nav"><a class="brand" href="/"><img class="logo" src="/vexa-icon.svg" alt=""><span>FindVexa</span></a><nav><a href="/affiliate-disclosure/">Affiliate Disclosure</a></nav></div></header>
 <main class="content-main"><article class="container product-detail">
 <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">หน้าแรก</a> / {f'<a href="{html.escape(category_url, quote=True)}">{html.escape(category)}</a>' if category_url else f'<span>{html.escape(category)}</span>'} / <span aria-current="page">{html.escape(title)}</span></nav>
 <div class="product-detail-grid">{gallery}
 <div><span class="pill">{html.escape(category)}</span><h1>{html.escape(title)}</h1>
 <p class="product-shop">{html.escape(shop)}</p><p>{html.escape(" · ".join(meta))}</p>
-<div class="product-score"><strong>{pickora_score}</strong><span>Pickora Score<small>คำนวณจากคะแนน ยอดขาย ส่วนลด และข้อมูล Affiliate</small></span></div>
+<div class="product-score"><strong>{pickora_score}</strong><span>FindVexa Score<small>คำนวณจากคะแนน ยอดขาย ส่วนลด และข้อมูล Affiliate</small></span></div>
 <div class="product-detail-price">{html.escape(price_text)}</div>
 {f'<p class="product-price-note">{html.escape(price_note)}</p>' if price > 0 else ''}
 <p class="affiliate-inline">ลิงก์ด้านล่างเป็น Affiliate link ราคา สต็อก และโปรโมชันอาจเปลี่ยนแปลง โปรดตรวจสอบบนหน้าร้านก่อนสั่งซื้อ</p>
@@ -1084,17 +1084,17 @@ def create_category_page(
 <title>{html.escape(metadata_title)}</title>
 <meta name="description" content="{html.escape(metadata_description, quote=True)}">
 <link rel="canonical" href="{html.escape(canonical, quote=True)}">
-<meta property="og:type" content="website"><meta property="og:site_name" content="Pickora"><meta property="og:title" content="{html.escape(category, quote=True)} สินค้าแนะนำ | Pickora"><meta property="og:url" content="{html.escape(canonical, quote=True)}">
-<meta name="twitter:card" content="summary">
+<meta property="og:type" content="website"><meta property="og:site_name" content="FindVexa"><meta property="og:title" content="{html.escape(category, quote=True)} สินค้าแนะนำ | FindVexa"><meta property="og:description" content="{html.escape(metadata_description, quote=True)}"><meta property="og:url" content="{html.escape(canonical, quote=True)}">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="{html.escape(metadata_title, quote=True)}"><meta name="twitter:description" content="{html.escape(metadata_description, quote=True)}">
 <link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/content.css"><link rel="stylesheet" href="/catalog.css"><link rel="stylesheet" href="/product.css">
 <script type="application/ld+json">{schema_json}</script></head><body>
-<header class="header"><div class="container nav"><a class="brand" href="/"><span class="logo">P</span><span>Pickora</span></a></div></header>
+<header class="header"><div class="container nav"><a class="brand" href="/"><img class="logo" src="/vexa-icon.svg" alt=""><span>FindVexa</span></a></div></header>
 <main><section class="section"><div class="container">
 <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">หน้าแรก</a> / <a href="/categories/">หมวดหมู่</a> / <span aria-current="page">{html.escape(category)}</span>{f' / <span aria-current="page">หน้า {page_number}</span>' if page_number > 1 else ''}</nav>
 <div class="category-header"><h1>{html.escape(category)}{f' · หน้า {page_number}' if page_number > 1 else ''}</h1>{f'<p>{html.escape(intro)}</p>' if intro else ''}<p>พบ {total_products:,} สินค้าที่ระบบคัดไว้ แสดงรายการ {len(visible_products):,} รายการ{f' · หน้า {page_number}' if page_count > 1 else ''}</p></div>
 {considerations_html}
 {faq_html}
-<section class="category-products"><h2>สินค้าในหมวดนี้</h2><p>สินค้าเรียงตาม Pickora Score โดยใช้ข้อมูลรายการที่มีในระบบ</p><div class="grid">{cards}</div></section></div></section></main>
+<section class="category-products"><h2>สินค้าในหมวดนี้</h2><p>สินค้าเรียงตาม FindVexa Score โดยใช้ข้อมูลรายการที่มีในระบบ</p><div class="grid">{cards}</div></section></div></section></main>
 {guide_links}
 {pagination_html}
 <p class="more-guides"><a href="/guides/">อ่านคู่มือเลือกซื้อเพิ่มเติม</a></p>
@@ -1125,13 +1125,13 @@ def create_category_index(
         )
     return f"""<!doctype html><html lang="th"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>หมวดหมู่สินค้า | Pickora</title>
-<meta name="description" content="เลือกดูสินค้าที่ Pickora คัดไว้ตามหมวดหมู่ พร้อมข้อมูลราคา คะแนน และยอดขายเพื่อเปรียบเทียบก่อนดูรายละเอียดสินค้า">
+<title>หมวดหมู่สินค้า | FindVexa</title>
+<meta name="description" content="เลือกดูสินค้าที่ FindVexa คัดไว้ตามหมวดหมู่ พร้อมข้อมูลราคา คะแนน และยอดขายเพื่อเปรียบเทียบก่อนดูรายละเอียดสินค้า">
 <link rel="canonical" href="{html.escape(canonical, quote=True)}">
 <link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/content.css"><link rel="stylesheet" href="/catalog.css">
 <script type="application/ld+json">{schema_json}</script></head><body>
-<header class="header"><div class="container nav"><a class="brand" href="/"><span class="logo">P</span><span>Pickora</span></a></div></header>
-<main><section class="section"><div class="container"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">หน้าแรก</a> / <span aria-current="page">หมวดหมู่</span></nav><div class="category-header"><h1>หมวดหมู่สินค้า</h1><p>เลือกดูสินค้าที่ Pickora คัดไว้ตามหมวดหมู่</p></div><div class="content-cards">{links}</div>{fallback}</div></section></main>
+<header class="header"><div class="container nav"><a class="brand" href="/"><img class="logo" src="/vexa-icon.svg" alt=""><span>FindVexa</span></a></div></header>
+<main><section class="section"><div class="container"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">หน้าแรก</a> / <span aria-current="page">หมวดหมู่</span></nav><div class="category-header"><h1>หมวดหมู่สินค้า</h1><p>เลือกดูสินค้าที่ FindVexa คัดไว้ตามหมวดหมู่</p></div><div class="content-cards">{links}</div>{fallback}</div></section></main>
 <footer><div class="container"><a href="/">หน้าแรก</a> · <a href="/guides/">คู่มือ</a> · <a href="/about/">เกี่ยวกับเรา</a> · <a href="/methodology/">วิธีคัดเลือกสินค้า</a> · <a href="/privacy/">ความเป็นส่วนตัว</a> · <a href="/affiliate-disclosure/">Affiliate Disclosure</a></div></footer>
 </body></html>"""
 

@@ -17,7 +17,7 @@
     const rows = [
       ["สินค้า", item => `<a href="${escapeHtml(item.detailUrl)}"><img src="${escapeHtml(item.image)}" alt="" loading="lazy" width="180" height="180"><strong>${escapeHtml(item.title)}</strong></a>`],
       ["ราคา", item => Number(item.price) > 0 ? `฿${Number(item.price).toLocaleString("th-TH")}` : "ดูราคาล่าสุด"],
-      ["Pickora Score", item => item.pickoraScore || "–"],
+      ["FindVexa Score", item => item.pickoraScore || "–"],
       ["คะแนน", item => item.rating || "–"],
       ["ยอดขาย", item => Number(item.sold || 0).toLocaleString("th-TH")],
       ["หมวด", item => escapeHtml(item.category || "–")]

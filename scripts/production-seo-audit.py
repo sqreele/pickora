@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check essential SEO signals on a deployed Pickora site."""
+"""Check essential SEO signals on a deployed FindVexa site."""
 
 from __future__ import annotations
 
@@ -44,13 +44,13 @@ class PageParser(HTMLParser):
 
 
 def fetch(url: str) -> tuple[str, str]:
-    request = urllib.request.Request(url, headers={"User-Agent": "PickoraSEOAudit/1.0"})
+    request = urllib.request.Request(url, headers={"User-Agent": "FindVexaSEOAudit/1.0"})
     with urllib.request.urlopen(request, timeout=20) as response:
         return response.read().decode("utf-8"), response.headers.get_content_type()
 
 
 def main() -> int:
-    base = (sys.argv[1] if len(sys.argv) > 1 else "https://pickora.hotelcarepro.com").rstrip("/")
+    base = (sys.argv[1] if len(sys.argv) > 1 else "https://findvexa.com").rstrip("/")
     errors: list[str] = []
     try:
         robots, _ = fetch(f"{base}/robots.txt")

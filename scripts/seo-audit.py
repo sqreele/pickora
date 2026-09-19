@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail-fast SEO checks for Pickora's source-controlled HTML."""
+"""Fail-fast SEO checks for FindVexa's source-controlled HTML."""
 
 from __future__ import annotations
 

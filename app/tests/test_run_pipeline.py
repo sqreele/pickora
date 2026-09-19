@@ -513,12 +513,15 @@ class ProductContentDepthTest(unittest.TestCase):
         )
         self.assertIn("Mobile & Gadgets", description)
         self.assertIn("ราคาอ้างอิง ฿500", description)
-        self.assertIn("Pickora Score 100", description)
+        self.assertIn("FindVexa Score 100", description)
         self.assertLessEqual(len(description), 156)
         first = create_product_page(product, [])
         second = create_product_page(dict(product), [])
         self.assertEqual(first, second)
-        self.assertIn(f"<title>{run_pipeline.html.escape(title)} | Pickora</title>", first)
+        self.assertIn(
+            f"<title>{run_pipeline.html.escape(title)} ราคา รีวิว และข้อมูลก่อนซื้อ | FindVexa</title>",
+            first,
+        )
 
     def test_duplicate_metadata_titles_use_factual_disambiguation(self):
         first = self.product("d" * 16)
@@ -886,7 +889,7 @@ class CategoryGenerationTest(unittest.TestCase):
             self.assertIn("คำถามที่พบบ่อย", first)
             self.assertIn("คู่มือเลือกซื้อ", first)
             self.assertIn('/reviews/wireless-earbuds.html', first)
-            self.assertIn("สินค้าเรียงตาม Pickora Score", first)
+            self.assertIn("สินค้าเรียงตาม FindVexa Score", first)
             self.assertNotIn("สิ่งที่ควรพิจารณาก่อนเลือกซื้อ", second)
             self.assertNotIn("คำถามที่พบบ่อย", second)
             self.assertNotIn("หมวด Audio รวมอุปกรณ์เสียง", second)
@@ -916,8 +919,8 @@ class CategoryGenerationTest(unittest.TestCase):
         second = run_pipeline.create_category_page(
             category, category_url, [product], page_number=2, page_count=2,
         )
-        self.assertIn("<title>Audio สินค้าแนะนำและวิธีเลือก | Pickora</title>", first)
-        self.assertIn("<title>Audio · หน้า 2 | Pickora</title>", second)
+        self.assertIn("<title>Audio สินค้าแนะนำและวิธีเลือก | FindVexa</title>", first)
+        self.assertIn("<title>Audio · หน้า 2 | FindVexa</title>", second)
         self.assertIn(
             f'<link rel="canonical" href="{run_pipeline.SITE_URL}{category_url}">', first,
         )

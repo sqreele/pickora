@@ -60,12 +60,12 @@ function productCard(product) {
   return `
     <article class="card">
       <a class="card-image-link" href="${esc(detailUrl)}"><img src="${esc(product.image)}" alt="${esc(product.title)}" loading="lazy" decoding="async" width="600" height="600"
-        onerror="this.src='https://placehold.co/800x800?text=Pickora'"></a>
+        onerror="this.src='https://placehold.co/800x800?text=FindVexa'"></a>
       <div class="card-body">
         ${product.categoryUrl ? `<a class="category" href="${esc(product.categoryUrl)}">${esc(category)}</a>` : ""}
         <h3 class="title">${esc(product.title)}</h3>
         <div class="meta"><span>${product.rating ? `★ ${esc(product.rating)}` : ""}</span><span>${esc(formatSold(product.sold))}</span></div>
-        ${product.pickoraScore || product.score ? `<div class="score-badge">Pickora Score ${esc(product.pickoraScore || product.score)}</div>` : ""}
+        ${product.pickoraScore || product.score ? `<div class="score-badge">FindVexa Score ${esc(product.pickoraScore || product.score)}</div>` : ""}
         <div class="price">${esc(formatPrice(product.price, product.priceMax))}</div>
         ${Number(product.price) > 0 ? '<small class="price-note">โปรโมชันจริงอาจต่ำกว่านี้</small>' : ""}
         <a class="primary buy" href="${esc(detailUrl)}" aria-label="ดูรายละเอียด ${esc(product.title)}">ดูรายละเอียด <span aria-hidden="true">→</span></a>
