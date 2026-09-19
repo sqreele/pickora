@@ -696,6 +696,7 @@ class ProductGenerationTest(unittest.TestCase):
                 "FEED_FILE": feed, "PRODUCTS_FILE": public_dir / "products.json",
                 "STATUS_FILE": public_dir / "feed-status.json",
                 "PRICE_HISTORY_FILE": public_dir / "price-history.json",
+                "SEO_STORAGE_FILE": data_dir / "search_console.sqlite3",
                 "SEO_STATUS_FILE": public_dir / "seo-status.json",
                 "SITEMAP_FILE": public_dir / "sitemap.xml",
                 "HOMEPAGE_CATALOG_FILE": public_dir / "homepage-catalog.html",
