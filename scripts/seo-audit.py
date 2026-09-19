@@ -12,6 +12,7 @@ from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 FRONTEND = ROOT / "frontend"
+PUBLIC = ROOT / "public"
 
 
 class PageParser(HTMLParser):
@@ -60,11 +61,44 @@ def local_target_exists(href: str) -> bool:
     )
 
 
+def product_has_rich_result_property(node: object) -> bool:
+    """Return whether a Product node has a Product-snippet eligibility field."""
+    if not isinstance(node, dict):
+        return False
+    node_type = node.get("@type")
+    is_product = node_type == "Product" or (
+        isinstance(node_type, list) and "Product" in node_type
+    )
+    return not is_product or any(
+        node.get(property_name) for property_name in ("offers", "review", "aggregateRating")
+    )
+
+
+def validate_product_nodes(value: object, relative: Path, errors: list[str]) -> None:
+    """Reject bare Product JSON-LD before it reaches Search Console."""
+    if isinstance(value, dict):
+        if not product_has_rich_result_property(value):
+            errors.append(
+                f"{relative}: Product JSON-LD needs offers, review, or aggregateRating"
+            )
+        for child in value.values():
+            validate_product_nodes(child, relative, errors)
+    elif isinstance(value, list):
+        for child in value:
+            validate_product_nodes(child, relative, errors)
+
+
 def main() -> int:
     errors: list[str] = []
     seen_titles: dict[str, Path] = {}
     seen_canonicals: dict[str, Path] = {}
-    pages = sorted(FRONTEND.rglob("*.html"))
+    # Generated product/category pages are production pages too. Include them
+    # when present so a schema regression is caught before deployment.
+    pages = (
+        sorted(FRONTEND.rglob("*.html"))
+        + sorted((PUBLIC / "products").rglob("*.html"))
+        + sorted((PUBLIC / "categories").rglob("*.html"))
+    )
     for page in pages:
         relative = page.relative_to(ROOT)
         source = page.read_text(encoding="utf-8")
@@ -102,9 +136,11 @@ def main() -> int:
             re.DOTALL,
         ):
             try:
-                json.loads(block)
+                schema = json.loads(block)
             except json.JSONDecodeError as error:
                 errors.append(f"{relative}: invalid JSON-LD ({error})")
+            else:
+                validate_product_nodes(schema, relative, errors)
 
     if errors:
         print("\n".join(f"ERROR {error}" for error in errors))

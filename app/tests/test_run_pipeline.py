@@ -426,7 +426,7 @@ class ProductContentDepthTest(unittest.TestCase):
         self.assertNotIn("<h2>เหมาะกับใคร</h2>", page)
         self.assertNotIn("<h2>จุดที่ควรพิจารณาก่อนเลือกซื้อ</h2>", page)
 
-    def test_generation_keeps_related_products_ranked_same_category_and_safe_schema(self):
+    def test_generation_keeps_related_products_ranked_and_uses_non_product_schema(self):
         with tempfile.TemporaryDirectory() as directory:
             public_dir = Path(directory)
             category = "Audio"
@@ -457,8 +457,9 @@ class ProductContentDepthTest(unittest.TestCase):
             self.assertEqual(len(identifiers), len(set(identifiers)))
             self.assertNotIn(products[0]["id"], identifiers)
             self.assertIn('/reviews/wireless-earbuds.html', page)
-            self.assertIn('"@type": "Product"', page)
+            self.assertIn('"@type": "WebPage"', page)
             self.assertIn('"@type": "BreadcrumbList"', page)
+            self.assertNotIn('"@type": "Product"', page)
             self.assertNotIn('"Offer"', page)
             self.assertNotIn("AggregateOffer", page)
             self.assertNotIn("AggregateRating", page)
@@ -738,7 +739,8 @@ class ProductGenerationTest(unittest.TestCase):
             )[1].split("</script>", 1)[0]
             schema = json.loads(schema_text)
             self.assertNotIn(None, schema["@graph"])
-            self.assertEqual(schema["@graph"][0]["@type"], "Product")
+            self.assertEqual(schema["@graph"][0]["@type"], "WebPage")
+            self.assertNotIn('"@type": "Product"', product_page)
             self.assertNotIn("undefined", schema_text)
             self.assertNotIn("offers", schema["@graph"][0])
             self.assertNotIn("aggregateRating", schema["@graph"][0])

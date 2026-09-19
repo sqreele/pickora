@@ -631,6 +631,22 @@ def breadcrumb_schema(items: list[tuple[str, str]]) -> dict[str, object]:
     }
 
 
+def web_page_schema(title: str, canonical: str, description: str) -> dict[str, object]:
+    """Describe an affiliate editorial page without claiming a sale offer.
+
+    Feed prices on FindVexa are explicitly displayed as reference prices, not
+    checkout prices or offers made by FindVexa.  A Product node without an
+    offer, review, or aggregate rating is not eligible for Product snippets,
+    and converting a reference price into an Offer would misrepresent it.
+    """
+    return {
+        "@type": "WebPage",
+        "name": title,
+        "url": canonical,
+        "description": description,
+    }
+
+
 def ranked_products(products: list[dict[str, object]]) -> list[dict[str, object]]:
     """Keep score ordering deterministic when feed scores are tied."""
     return sorted(
@@ -932,13 +948,9 @@ def create_product_page(
         + "</ul></section>"
         if considerations else ""
     )
-    schema = {
-        "@type": "Product", "name": title,
-        "image": images, "category": category, "url": canonical,
-        "description": description,
-    }
     # Feed prices are explicitly presented as reference prices and may differ
-    # from checkout pricing, so emitting Offer markup would overstate them.
+    # from checkout pricing. They are therefore not Offer or AggregateOffer
+    # data, and the affiliate page must not emit Product rich-result markup.
     breadcrumbs = [("หน้าแรก", "/")]
     if category_url:
         breadcrumbs.append((category, category_url))
@@ -946,7 +958,7 @@ def create_product_page(
     graph = {
         "@context": "https://schema.org",
         "@graph": [
-            schema,
+            web_page_schema(title, canonical, description),
             breadcrumb_schema(breadcrumbs),
         ],
     }
