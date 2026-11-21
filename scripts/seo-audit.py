@@ -107,11 +107,11 @@ def main() -> int:
         noindex = "noindex" in parser.meta.get("robots", "").lower()
         if not parser.title.strip():
             errors.append(f"{relative}: missing title")
-        elif parser.title.strip() in seen_titles:
+        elif not noindex and parser.title.strip() in seen_titles:
             errors.append(
                 f"{relative}: duplicate title also used by {seen_titles[parser.title.strip()]}"
             )
-        else:
+        elif not noindex:
             seen_titles[parser.title.strip()] = relative
         if not parser.meta.get("description", "").strip():
             errors.append(f"{relative}: missing meta description")

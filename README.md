@@ -1,12 +1,12 @@
-# Pickora
+# FindVexa
 
-Shopee Affiliate product discovery site for `pickora.hotelcarepro.com`.
+Shopee Affiliate product discovery site for `findvexa.com`.
 
 ## Architecture
 
 - `scheduler`: downloads the private Shopee CSV feed and refreshes products daily
 - `worker`: manual one-off feed update
-- `web`: serves the Pickora frontend and generated JSON
+- `web`: serves the FindVexa frontend and generated JSON
 - `public/products.json`: selected products
 - `public/feed-status.json`: pipeline status
 
@@ -103,15 +103,15 @@ Create this DNS record:
 
 ```text
 Type: A
-Name: pickora
+Name: @
 Value: DIGITALOCEAN_SERVER_IP
 ```
 
 For an existing host Nginx, copy:
 
 ```bash
-sudo cp nginx/host-pickora.conf.example /etc/nginx/sites-available/pickora
-sudo ln -s /etc/nginx/sites-available/pickora /etc/nginx/sites-enabled/pickora
+sudo cp nginx/host-pickora.conf.example /etc/nginx/sites-available/findvexa
+sudo ln -s /etc/nginx/sites-available/findvexa /etc/nginx/sites-enabled/findvexa
 sudo nginx -t
 sudo systemctl reload nginx
 ```
@@ -119,7 +119,7 @@ sudo systemctl reload nginx
 Add HTTPS:
 
 ```bash
-sudo certbot --nginx -d pickora.hotelcarepro.com
+sudo certbot --nginx -d findvexa.com -d www.findvexa.com
 ```
 
 When Cloudflare proxy is enabled, set SSL/TLS mode to Full (strict) after the certificate is active.
@@ -198,5 +198,5 @@ Run automated checks:
 ```bash
 python -m unittest discover -s app/tests -v
 python3 scripts/seo-audit.py
-python3 scripts/production-seo-audit.py https://pickora.hotelcarepro.com
+python3 scripts/production-seo-audit.py https://findvexa.com
 ```
