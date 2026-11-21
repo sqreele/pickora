@@ -961,5 +961,25 @@ class CategoryGenerationTest(unittest.TestCase):
             run_pipeline.category_metadata_description(category, 2),
         )
 
+
+class PrioritySelectionTest(unittest.TestCase):
+    def test_priority_quota_prefers_tools_and_excludes_beauty_keyword_matches(self):
+        frame = run_pipeline.pd.DataFrame([
+            {"title": "สว่านไร้สาย", "category": "Home & Living", "score": 10},
+            {"title": "ไขควงไฟฟ้า", "category": "Home & Living", "score": 9},
+            {"title": "เครื่องมือแต่งหน้า", "category": "Beauty", "score": 100},
+            {"title": "สินค้าอันดับสูง", "category": "Beauty", "score": 99},
+        ])
+        with patch.multiple(
+            run_pipeline,
+            MAX_PRODUCTS=3,
+            PRIORITY_KEYWORDS=["สว่าน", "ไขควง", "เครื่องมือ"],
+            PRIORITY_EXCLUDED_CATEGORIES={"beauty"},
+            PRIORITY_PRODUCT_MINIMUM=2,
+        ):
+            selected = run_pipeline.select_ranked_products(frame)
+        self.assertEqual(selected["title"].tolist()[:2], ["สว่านไร้สาย", "ไขควงไฟฟ้า"])
+        self.assertEqual(len(selected), 3)
+
 if __name__ == "__main__":
     unittest.main()

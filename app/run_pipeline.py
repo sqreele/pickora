@@ -165,6 +165,19 @@ EXCLUDE_KEYWORDS = [
     for x in os.getenv("EXCLUDE_KEYWORDS", "").split(",")
     if x.strip()
 ]
+PRIORITY_KEYWORDS = [
+    x.strip().lower()
+    for x in os.getenv("PRIORITY_KEYWORDS", "").split(",")
+    if x.strip()
+]
+PRIORITY_EXCLUDED_CATEGORIES = {
+    x.strip().casefold()
+    for x in os.getenv("PRIORITY_EXCLUDED_CATEGORIES", "").split(",")
+    if x.strip()
+}
+PRIORITY_PRODUCT_MINIMUM = max(
+    0, int(os.getenv("PRIORITY_PRODUCT_MINIMUM", "0"))
+)
 
 WEIGHT_SOLD = float(os.getenv("WEIGHT_SOLD", "0.50"))
 WEIGHT_RATING = float(os.getenv("WEIGHT_RATING", "1000"))
@@ -513,6 +526,30 @@ def keyword_filter(frame: pd.DataFrame, title_column: str) -> pd.DataFrame:
         frame = frame[~exclude_mask]
 
     return frame
+
+
+def select_ranked_products(frame: pd.DataFrame) -> pd.DataFrame:
+    """Reserve catalog capacity for configured product-intent keywords."""
+    if not PRIORITY_KEYWORDS or PRIORITY_PRODUCT_MINIMUM <= 0:
+        return frame.nlargest(MAX_PRODUCTS, "score")
+
+    searchable = (
+        frame["title"].astype(str).str.lower()
+        + " " + frame["category"].astype(str).str.lower()
+    )
+    matches_priority = searchable.apply(
+        lambda value: any(keyword in value for keyword in PRIORITY_KEYWORDS)
+    )
+    category_is_excluded = frame["category"].astype(str).str.casefold().isin(
+        PRIORITY_EXCLUDED_CATEGORIES
+    )
+    priority = frame[matches_priority & ~category_is_excluded].nlargest(
+        PRIORITY_PRODUCT_MINIMUM, "score"
+    )
+    remaining = frame.drop(index=priority.index).nlargest(
+        max(0, MAX_PRODUCTS - len(priority)), "score"
+    )
+    return pd.concat([priority, remaining], ignore_index=True)
 
 
 def product_id(link: str) -> str:
@@ -1490,13 +1527,8 @@ def process_feed() -> None:
         ~external_ids.str.lower().isin({"", "nan", "none", "null"}),
         result["productUrl"].astype(str),
     )
-    result = (
-        result
-        .drop_duplicates(subset=["_identity"])
-        .nlargest(MAX_PRODUCTS, "score")
-        .drop(columns=["_identity"])
-        .reset_index(drop=True)
-    )
+    result = result.drop_duplicates(subset=["_identity"])
+    result = select_ranked_products(result).drop(columns=["_identity"])
     all_records = result.to_dict(orient="records")
     records = [
         product for product in all_records
