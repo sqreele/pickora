@@ -468,6 +468,32 @@ class ProductContentDepthTest(unittest.TestCase):
                 page,
             )
 
+    def test_archived_product_is_available_but_noindex_and_omitted_from_sitemap(self):
+        with tempfile.TemporaryDirectory() as directory:
+            public_dir = Path(directory)
+            active = self.product("a" * 16, category="Audio")
+            archive = {
+                "product_id": "b" * 16,
+                "product_name": "Former product with adequate title",
+                "category": "Audio",
+                "last_reference_price": 250,
+                "last_active_at": "2026-01-01T00:00:00+00:00",
+            }
+            with patch.multiple(
+                run_pipeline,
+                PUBLIC_DIR=public_dir,
+                PRODUCT_PAGES_DIR=public_dir / "products",
+                CATEGORY_PAGES_DIR=public_dir / "categories",
+                SITEMAP_FILE=public_dir / "sitemap.xml",
+                HOMEPAGE_CATALOG_FILE=public_dir / "homepage-catalog.html",
+            ):
+                run_pipeline.write_product_pages_and_sitemap([active], [archive])
+            page = (public_dir / "products" / archive["product_id"] / "index.html").read_text(encoding="utf-8")
+            sitemap = (public_dir / "sitemap.xml").read_text(encoding="utf-8")
+            self.assertIn('<meta name="robots" content="noindex,follow">', page)
+            self.assertIn(f'<link rel="canonical" href="{run_pipeline.SITE_URL}/products/{archive["product_id"]}/">', page)
+            self.assertNotIn(f'/products/{archive["product_id"]}/</loc>', sitemap)
+
     def test_related_selection_prefers_meaningful_title_overlap_deterministically(self):
         current = self.product("a" * 16, category="Audio", score=10)
         current["title"] = "Wireless Earbuds Pro"

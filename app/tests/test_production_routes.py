@@ -107,5 +107,15 @@ class ProductionRouteTest(unittest.TestCase):
         self.assertIn("schedule.every(SYNC_INTERVAL_HOURS).hours", scheduler)
         self.assertIn("SYNC_INTERVAL_HOURS=2", example_env)
 
+    def test_homepage_duplicate_urls_redirect_to_the_apex_canonical(self):
+        nginx = (ROOT / "nginx/default.conf").read_text(encoding="utf-8")
+        host = (ROOT / "nginx/host-pickora.conf.example").read_text(encoding="utf-8")
+        self.assertIn("location = /index.html {", nginx)
+        index_block = nginx.split("location = /index.html {", 1)[1].split("}", 1)[0]
+        self.assertIn("return 308 /;", index_block)
+        self.assertIn("server_name www.findvexa.com;", host)
+        self.assertIn("return 301 https://findvexa.com$request_uri;", host)
+        self.assertIn("server_name findvexa.com;", host)
+
 if __name__ == "__main__":
     unittest.main()

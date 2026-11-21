@@ -64,6 +64,7 @@ class SeoStorageTest(unittest.TestCase):
         }, [{"id": "c" * 16, "detailUrl": "/products/" + "c" * 16 + "/", "title": "Related active product", "category": "Beauty", "price": 100, "pickoraScore": 80, "image": "https://img.test/c"}])
         self.assertIn("สินค้านี้ไม่อยู่ในรายการอัปเดตล่าสุดของ FindVexa", page)
         self.assertIn("สินค้าที่เกี่ยวข้องในหมวดเดียวกัน", page)
+        self.assertIn('<meta name="robots" content="noindex,follow">', page)
         self.assertIn('"@type": "WebPage"', page)
         self.assertIn('"@type": "BreadcrumbList"', page)
         self.assertNotIn('"@type": "Product"', page)

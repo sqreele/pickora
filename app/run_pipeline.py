@@ -1052,7 +1052,7 @@ def create_archived_product_page(record: dict[str, object], related: list[dict[s
     related_html = f'<section class="related-products"><h2>สินค้าที่เกี่ยวข้องในหมวดเดียวกัน</h2><div class="grid">{cards}</div></section>' if cards else ""
     category_crumb = f'<a href="{html.escape(category_url, quote=True)}">{html.escape(category)}</a>' if category_url else html.escape(category)
     return f'''<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{html.escape(clean_product_metadata_title(title))} ข้อมูลอ้างอิงเดิม | FindVexa</title><meta name="description" content="{html.escape(description, quote=True)}"><link rel="canonical" href="{html.escape(canonical, quote=True)}">
+<title>{html.escape(clean_product_metadata_title(title))} ข้อมูลอ้างอิงเดิม | FindVexa</title><meta name="description" content="{html.escape(description, quote=True)}"><meta name="robots" content="noindex,follow"><link rel="canonical" href="{html.escape(canonical, quote=True)}">
 <link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/content.css"><link rel="stylesheet" href="/catalog.css"><script type="application/ld+json">{schema_json}</script></head><body>
 <div class="notice">หน้านี้มีข้อมูลอ้างอิงจากรายการเดิมของ FindVexa</div><header class="header"><div class="container nav"><a class="brand" href="/"><img class="logo" src="/vexa-icon.svg" alt=""><span>FindVexa</span></a><nav><a href="/affiliate-disclosure/">Affiliate Disclosure</a></nav></div></header>
 <main class="content-main"><article class="container product-detail"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">หน้าแรก</a> / {category_crumb} / <span aria-current="page">{html.escape(title)}</span></nav><span class="pill">ข้อมูลอ้างอิงเดิม</span><h1>{html.escape(title)}</h1><p class="product-shop">{html.escape(category)}</p><section class="product-content"><p><strong>สินค้านี้ไม่อยู่ในรายการอัปเดตล่าสุดของ FindVexa</strong></p><p>หน้านี้เก็บข้อมูลเดิมไว้เพื่ออ้างอิงเท่านั้น โปรดตรวจสอบรายละเอียดและความพร้อมจำหน่ายจากแหล่งข้อมูลปัจจุบันก่อนตัดสินใจซื้อ</p>{price_html}<p>บันทึกล่าสุด: {html.escape(str(record.get('last_active_at') or ''))}</p></section>{related_html}</article></main><footer><div class="container"><a href="/">หน้าแรก</a> · <a href="/guides/">คู่มือ</a> · <a href="/about/">เกี่ยวกับเรา</a> · <a href="/methodology/">วิธีคัดเลือกสินค้า</a> · <a href="/privacy/">ความเป็นส่วนตัว</a> · <a href="/affiliate-disclosure/">Affiliate Disclosure</a></div></footer></body></html>'''
@@ -1277,10 +1277,6 @@ def write_product_pages_and_sitemap(
     entries.extend(
         f"<url><loc>{html.escape(SITE_URL + str(product['detailUrl']))}</loc><changefreq>daily</changefreq><priority>0.8</priority></url>"
         for product in products
-    )
-    entries.extend(
-        f"<url><loc>{html.escape(SITE_URL + '/products/' + str(archive['product_id']) + '/')}</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>"
-        for archive in archives
     )
     entries.extend(
         f"<url><loc>{html.escape(SITE_URL + category_page_url(str(category_products[0]['categoryUrl']), page_number))}</loc><changefreq>daily</changefreq><priority>0.7</priority></url>"

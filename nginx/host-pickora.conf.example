@@ -2,7 +2,16 @@ server {
     listen 80;
     listen [::]:80;
 
-    server_name pickora.hotelcarepro.com;
+    server_name www.findvexa.com;
+
+    return 301 https://findvexa.com$request_uri;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+
+    server_name findvexa.com;
 
     location / {
         proxy_pass http://127.0.0.1:8080;
