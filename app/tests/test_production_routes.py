@@ -84,6 +84,10 @@ class ProductionRouteTest(unittest.TestCase):
         self.assertIn(
             "try_files /data/categories/$1/index.html =404;", nginx
         )
+
+    def test_web_port_is_bound_to_loopback_only(self):
+        compose = (ROOT / "docker-compose.yml").read_text(encoding="utf-8")
+        self.assertIn('"127.0.0.1:${WEB_PORT:-8080}:80"', compose)
     def test_dashboard_hidden_states_cannot_be_overridden(self):
         css = (
             ROOT / "frontend/analytics/dashboard-state.css"
