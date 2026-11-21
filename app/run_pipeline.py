@@ -52,7 +52,7 @@ THIN_CATEGORY_DISCOVERY_LIMIT = 12
 CATEGORY_GUIDE_MAP = {
     "Audio": [("/reviews/wireless-earbuds.html", "คู่มือเลือกหูฟังไร้สาย")],
     "Computers & Accessories": [("/reviews/mechanical-keyboard.html", "คู่มือเลือก Mechanical Keyboard")],
-    "Home & Living": [("/reviews/office-chair.html", "คู่มือเลือกเก้าอี้ทำงาน"), ("/reviews/water-bottle.html", "คู่มือเลือกขวดเก็บอุณหภูมิ")],
+    "Home & Living": [("/reviews/tools.html", "คู่มือเลือกเครื่องมือช่าง"), ("/reviews/office-chair.html", "คู่มือเลือกเก้าอี้ทำงาน"), ("/reviews/water-bottle.html", "คู่มือเลือกขวดเก็บอุณหภูมิ")],
     "Home Appliances": [("/reviews/air-fryer.html", "คู่มือเลือกหม้อทอดไร้น้ำมัน"), ("/reviews/robot-vacuum.html", "คู่มือเลือกหุ่นยนต์ดูดฝุ่น"), ("/reviews/portable-fan.html", "คู่มือเลือกพัดลมพกพา")],
     "Mobile & Gadgets": [("/reviews/power-bank.html", "คู่มือเลือก Power Bank"), ("/reviews/smart-watch.html", "คู่มือเลือก Smart Watch")],
 }
@@ -200,6 +200,7 @@ STATIC_SITEMAP_PATHS = (
     ("/reviews/office-chair.html", "monthly", "0.7"),
     ("/reviews/smart-watch.html", "monthly", "0.7"),
     ("/reviews/water-bottle.html", "monthly", "0.7"),
+    ("/reviews/tools.html", "monthly", "0.8"),
     ("/compare/portable-fan-types.html", "monthly", "0.7"),
     ("/compare/power-bank-capacity.html", "monthly", "0.7"),
     ("/compare/air-fryer-vs-oven.html", "monthly", "0.7"),
